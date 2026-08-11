@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import TMDBTest from "./pages/TMDBTest";
+
 import Landing from "./pages/Landing";
 import CreateRoom from "./pages/CreateRoom";
 import JoinRoom from "./pages/JoinRoom";
@@ -19,6 +21,7 @@ function App() {
         <Route path="/selection" element={<MovieSelection />} />
         <Route path="/voting" element={<Voting />} />
         <Route path="/results" element={<Results />} />
+        <Route path="/tmdb-test" element={<TMDBTest />} />
       </Routes>
     </BrowserRouter>
   );
