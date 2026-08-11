@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import TMDBTest from "./pages/TMDBTest";
+import FirebaseTest from "./pages/FirebaseTest";
 
 import Landing from "./pages/Landing";
 import CreateRoom from "./pages/CreateRoom";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/voting" element={<Voting />} />
         <Route path="/results" element={<Results />} />
         <Route path="/tmdb-test" element={<TMDBTest />} />
+        <Route path="firebase-test" element={<FirebaseTest />} />
       </Routes>
     </BrowserRouter>
   );

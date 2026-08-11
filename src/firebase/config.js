@@ -1,25 +1,25 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+
+import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA9XASCiCI1pXBvBvF4E7LaU-9Gkb_gSRw",
-  authDomain: "movie-night-matcher-myniani.firebaseapp.com",
-  projectId: "movie-night-matcher-myniani",
-  storageBucket: "movie-night-matcher-myniani.firebasestorage.app",
-  messagingSenderId: "1427034492",
-  appId: "1:1427034492:web:72e99e411fb657086b54f9",
-  measurementId: "G-2M1TDKSKW9"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 
 export const db = getFirestore(app);
