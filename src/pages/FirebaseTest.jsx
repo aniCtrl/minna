@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useAuth } from "../hooks/useAuth";
 
 function FirebaseTest() {
   const [message, setMessage] = useState("");
+
+  const { user, loading } = useAuth();
 
   async function pingFirebase() {
     try {
@@ -23,9 +26,15 @@ function FirebaseTest() {
     }
   }
 
+    if (loading) {
+      return <p>Loading authentication...</p>;
+    }
+
   return (
     <div>
       <h1>Firebase Test</h1>
+
+      <p>UID: {user?.uid}</p>
 
       <button onClick={pingFirebase}>
         Ping Firebase
