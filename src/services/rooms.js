@@ -1,4 +1,4 @@
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 function generateRoomCode(length = 6) {
@@ -31,4 +31,35 @@ export async function createRoom(hostUid, displayName) {
   });
 
   return roomCode;
+}
+
+export async function joinRoom(roomCode, uid, displayName) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+  const roomSnap = await getDoc(roomRef);
+
+  if (!roomSnap.exists()) {
+    throw new Error("ROOM_NOT_FOUND");
+  }
+
+  const roomData = roomSnap.data();
+
+  if (roomData.status !== "lobby") {
+    throw new Error("ROOM_NOT_JOINABLE");
+  }
+
+  const alreadyMember = roomData.members?.[uid];
+
+  if (alreadyMember) {
+    return normalizedCode;
+  }
+
+  await updateDoc(roomRef, {
+    [`members.${uid}`]: {
+      displayName,
+    },
+  });
+
+  return normalizedCode;
 }
