@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useMoviePool } from "../hooks/useMoviePool";
-import { useVotes } from "../hooks/useVotes";
+import { useAllVotes } from "../hooks/useAllVotes";
 import { computeMatches } from "../services/votes";
 
 function Results() {
@@ -15,11 +15,7 @@ function Results() {
     error: roomError,
   } = useRoom(roomCode);
 
-  const {
-    members,
-    loading: membersLoading,
-    error: membersError,
-  } = useMembers(roomCode);
+  const members = useMembers(room);
 
   const {
     movies,
@@ -31,11 +27,20 @@ function Results() {
     votes,
     loading: votesLoading,
     error: votesError,
-  } = useVotes(roomCode);
+  } = useAllVotes(roomCode);
+
+  console.log("RESULTS DEBUG:", {
+    roomCode,
+    roomLoading,
+    moviesLoading,
+    votesLoading,
+    members,
+    movies,
+    votes,
+  });
 
   if (
     roomLoading ||
-    membersLoading ||
     moviesLoading ||
     votesLoading
   ) {
@@ -44,10 +49,6 @@ function Results() {
 
   if (roomError) {
     return <p>{roomError}</p>;
-  }
-
-  if (membersError) {
-    return <p>{membersError}</p>;
   }
 
   if (moviesError) {
@@ -76,9 +77,9 @@ function Results() {
             <div key={movie.id}>
               <h3>{movie.title}</h3>
 
-              {movie.poster_path && (
+              {movie.posterPath && (
                 <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`}
                   alt={movie.title}
                   width="200"
                 />
@@ -89,6 +90,7 @@ function Results() {
       ) : (
         <section>
           <h2>No perfect matches 😭</h2>
+
           <p>
             Nobody found a movie that everyone liked.
           </p>
@@ -99,3 +101,4 @@ function Results() {
 }
 
 export default Results;
+

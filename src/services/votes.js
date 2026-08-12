@@ -23,14 +23,13 @@ export async function castVote(roomCode, uid, movieId, vote) {
 }
 
 export function computeMatches(movies, votes, members) {
-  const memberIds = members.map((member) => member.uid);
-
   const matches = movies.filter((movie) => {
-    return memberIds.every((uid) => {
-      const voteId = `${uid}_${movie.id}`;
+    return members.every((member) => {
+      const voteId = `${member.uid}_${movie.id}`;
+
       const vote = votes[voteId];
 
-      return vote?.value === "like";
+      return vote?.vote === "like";
     });
   });
 
