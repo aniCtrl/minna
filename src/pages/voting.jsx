@@ -1,14 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useVotes } from "../hooks/useVotes";
 import { castVote } from "../services/votes";
 
+import { useRoom } from "../hooks/useRoom";
+import { useMembers } from "../hooks/useMembers";
+import { useVotingCompletion } from "../hooks/useVotingCompletion";
+
 function Voting() {
   const { roomCode } = useParams();
 
+  const navigate = useNavigate();
+
   const { user, loading: authLoading } = useAuth();
+
+  const {
+    room,
+    loading: roomLoading,
+    error: roomError,
+  } = useRoom(roomCode);
+
+  const members = useMembers(room);
 
   const {
     movies,
@@ -40,6 +54,14 @@ function Voting() {
     }
   }, [completedVoting]);
 
+  useEffect(() => {
+    if (room?.status === "results") {
+      navigate(`/results/${roomCode}`);
+    }
+  }, [room?.status, roomCode, navigate]);
+
+  
+
   async function handleVote(movie, vote) {
     if (!user?.uid) {
       setError("You must be signed in to vote.");
@@ -64,8 +86,31 @@ function Voting() {
     }
   }
 
-  if (authLoading || moviesLoading || votesLoading) {
+  const isHost =
+    Boolean(user?.uid) &&
+    Boolean(room?.hostUid) &&
+    user.uid === room.hostUid;
+
+  useVotingCompletion({
+    roomCode,
+    hostUid: room?.hostUid,
+    isHost,
+    memberCount: members.length,
+    movieCount: movies.length,
+    status: room?.status,
+  });
+
+  if (
+    authLoading ||
+    roomLoading ||
+    moviesLoading ||
+    votesLoading
+  ) {
     return <p>Loading voting session...</p>;
+  }
+
+  if (roomError) {
+    return <p>{roomError}</p>;
   }
 
   if (moviesError) {

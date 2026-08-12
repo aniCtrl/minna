@@ -20,7 +20,7 @@ function App() {
         <Route path="/join" element={<JoinRoom />} />
         <Route path="/movie-selection/:roomCode" element={<MovieSelection />} />
         <Route path="/voting/:roomCode" element={<Voting />} />
-        <Route path="/results" element={<Results />} />
+        <Route path="/results/:roomCode" element={<Results />} />
         <Route path="/tmdb-test" element={<TMDBTest />} />
         <Route path="/firebase-test" element={<FirebaseTest />} />
         <Route path="/lobby/:roomCode" element={<Lobby />} />

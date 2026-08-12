@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, runTransaction } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 function generateRoomCode(length = 6) {
@@ -112,5 +112,33 @@ export async function startVoting(roomCode, uid) {
 
   await updateDoc(roomRef, {
     status: "voting",
+  });
+}
+
+export async function completeVoting(roomCode, hostUid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+
+  await runTransaction(db, async (transaction) => {
+    const roomSnapshot = await transaction.get(roomRef);
+
+    if (!roomSnapshot.exists()) {
+      throw new Error("Room not found.");
+    }
+
+    const roomData = roomSnapshot.data();
+
+    if (roomData.hostUid !== hostUid) {
+      throw new Error("Only the host can complete voting.");
+    }
+
+    if (roomData.status !== "voting") {
+      return;
+    }
+
+    transaction.update(roomRef, {
+      status: "results",
+    });
   });
 }
