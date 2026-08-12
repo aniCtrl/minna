@@ -1,6 +1,101 @@
+import { useParams } from "react-router-dom";
+
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useVotes } from "../hooks/useVotes";
 import { computeMatches } from "../services/votes";
 
+function Results() {
+  const { roomCode } = useParams();
+
+  const {
+    room,
+    loading: roomLoading,
+    error: roomError,
+  } = useRoom(roomCode);
+
+  const {
+    members,
+    loading: membersLoading,
+    error: membersError,
+  } = useMembers(roomCode);
+
+  const {
+    movies,
+    loading: moviesLoading,
+    error: moviesError,
+  } = useMoviePool(roomCode);
+
+  const {
+    votes,
+    loading: votesLoading,
+    error: votesError,
+  } = useVotes(roomCode);
+
+  if (
+    roomLoading ||
+    membersLoading ||
+    moviesLoading ||
+    votesLoading
+  ) {
+    return <p>Loading results...</p>;
+  }
+
+  if (roomError) {
+    return <p>{roomError}</p>;
+  }
+
+  if (membersError) {
+    return <p>{membersError}</p>;
+  }
+
+  if (moviesError) {
+    return <p>{moviesError}</p>;
+  }
+
+  if (votesError) {
+    return <p>{votesError}</p>;
+  }
+
+  const matches = computeMatches(
+    movies,
+    votes,
+    members
+  );
+
+  return (
+    <div>
+      <h1>Movie Night Results</h1>
+
+      {matches.length > 0 ? (
+        <section>
+          <h2>Everyone liked</h2>
+
+          {matches.map((movie) => (
+            <div key={movie.id}>
+              <h3>{movie.title}</h3>
+
+              {movie.poster_path && (
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  width="200"
+                />
+              )}
+            </div>
+          ))}
+        </section>
+      ) : (
+        <section>
+          <h2>No perfect matches 😭</h2>
+          <p>
+            Nobody found a movie that everyone liked.
+          </p>
+        </section>
+      )}
+    </div>
+  );
+}
+
+export default Results;
