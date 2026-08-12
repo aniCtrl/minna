@@ -29,16 +29,6 @@ function Results() {
     error: votesError,
   } = useAllVotes(roomCode);
 
-  console.log("RESULTS DEBUG:", {
-    roomCode,
-    roomLoading,
-    moviesLoading,
-    votesLoading,
-    members,
-    movies,
-    votes,
-  });
-
   if (
     roomLoading ||
     moviesLoading ||
