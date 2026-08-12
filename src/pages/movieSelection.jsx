@@ -11,6 +11,7 @@ function MovieSelection() {
   const { room } = useRoom(roomCode);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
   const [addingMovieId, setAddingMovieId] = useState(null);
@@ -18,12 +19,12 @@ function MovieSelection() {
 
   const uid = user?.uid;
   const navigate = useNavigate();
-  
+
   useEffect(() => {
-  if (room?.status === "voting") {
-    navigate(`/voting/${roomCode}`);
-  }
-}, [room?.status, roomCode, navigate]);
+    if (room?.status === "voting") {
+      navigate(`/voting/${roomCode}`);
+    }
+  }, [room?.status, roomCode, navigate]);
 
   const {
     movies,
@@ -40,9 +41,13 @@ function MovieSelection() {
       setSearching(true);
       setError("");
 
+      setSearchResults([]);
+      setHasSearched(false);
+
       const results = await searchMovies(query);
 
       setSearchResults(results);
+      setHasSearched(true);
     } catch (err) {
       console.error("Movie search error:", err);
       setError("Something went wrong while searching.");
@@ -130,6 +135,9 @@ function MovieSelection() {
       {moviesError && <p>{moviesError}</p>}
 
       <div>
+        {hasSearched && searchResults.length === 0 && !searching && (
+          <p>No movies found. Try a different search.</p>
+        )}
         {searchResults.map((movie) => {
           const alreadyAdded = movies.some(
             (poolMovie) => poolMovie.tmdbId === movie.id

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { searchMovies } from "../services/tmdb";
 
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
+
 function TMDBTest() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -40,20 +43,27 @@ function TMDBTest() {
 
       {error && <p>{error}</p>}
 
-      {movies.map((movie) => (
-        <div key={movie.id}>
-          {movie.poster_path && (
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={movie.title}
-              width="200"
-            />
-          )}
+      {loading && (
+        <LoadingState message="Searching TMDB..." />
+      )}
 
-          <h2>{movie.title}</h2>
-          <p>{movie.release_date?.slice(0, 4)}</p>
-        </div>
-      ))}
+      {error && (
+        <ErrorState message={error} />
+      )}
+
+      {!loading && !error && movies.length === 0 && query && (
+        <p>No movies found. Try a different search.</p>
+      )}
+
+      {!loading &&
+        !error &&
+        movies.length > 0 &&
+        movies.map((movie) => (
+          <div key={movie.id}>
+            <h2>{movie.title}</h2>
+            <p>{movie.release_date}</p>
+          </div>
+        ))}
     </div>
   );
 }
