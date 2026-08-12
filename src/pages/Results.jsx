@@ -1,11 +1,6 @@
-function Results() {
-  return (
-    <div>
-      <h1>Results</h1>
-      <p>This is where you get the result.</p>
-    </div>
-  );
-}
-
-export default Results;
+import { useRoom } from "../hooks/useRoom";
+import { useMembers } from "../hooks/useMembers";
+import { useMoviePool } from "../hooks/useMoviePool";
+import { useVotes } from "../hooks/useVotes";
+import { computeMatches } from "../services/votes";
 
