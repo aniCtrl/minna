@@ -18,12 +18,12 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/create" element={<CreateRoom />} />
         <Route path="/join" element={<JoinRoom />} />
-        <Route path="/lobby" element={<Lobby />} />
         <Route path="/selection" element={<MovieSelection />} />
         <Route path="/voting" element={<Voting />} />
         <Route path="/results" element={<Results />} />
         <Route path="/tmdb-test" element={<TMDBTest />} />
         <Route path="firebase-test" element={<FirebaseTest />} />
+        <Route path="/lobby/:roomCode" element={<Lobby />} />
       </Routes>
     </BrowserRouter>
   );

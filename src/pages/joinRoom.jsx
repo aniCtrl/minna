@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { joinRoom } from "../services/rooms";
 
 function JoinRoom() {
+
+  const navigate = useNavigate();
+
   const { user, loading } = useAuth();
 
   const [roomCode, setRoomCode] = useState("");
@@ -20,9 +24,13 @@ function JoinRoom() {
       setMessage("");
       setError("");
 
-      await joinRoom(roomCode, user.uid, "Anonymous User");
+      const joinedRoomCode = await joinRoom(
+        roomCode,
+        user.uid,
+        "Anonymous User"
+      );
 
-      setMessage("Successfully joined the room!");
+      navigate(`/lobby/${joinedRoomCode}`);
     } catch (error) {
       console.error("Failed to join room:", error);
 
