@@ -16,7 +16,7 @@ function TMDBTest() {
 
       const results = await searchMovies(query);
       setMovies(results);
-    } catch (err) {
+    } catch {
       setError("Something went wrong while searching.");
     } finally {
       setLoading(false);

@@ -63,3 +63,28 @@ export async function joinRoom(roomCode, uid, displayName) {
 
   return normalizedCode;
 }
+
+export async function addMovieToPool(roomCode, movie) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const movieRef = doc(
+    db,
+    "rooms",
+    normalizedCode,
+    "movies",
+    String(movie.id)
+  );
+
+  const movieSnapshot = await getDoc(movieRef);
+
+  if (movieSnapshot.exists()) {
+    throw new Error("MOVIE_ALREADY_ADDED");
+  }
+
+  await setDoc(movieRef, {
+    tmdbId: movie.id,
+    title: movie.title,
+    posterPath: movie.poster_path ?? null,
+    releaseDate: movie.release_date ?? null,
+  });
+}
