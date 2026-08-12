@@ -1,12 +1,20 @@
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 
 function Lobby() {
   const { roomCode } = useParams();
-  
+  const navigate = useNavigate();
   const { room, loading, error } = useRoom(roomCode);
   const members = useMembers(room);
+
+  useEffect(() => {
+  if (room?.status === "voting") {
+    navigate(`/voting/${roomCode}`);
+  }
+}, [room?.status, roomCode, navigate]);
 
   if (loading) {
     return <p>Loading room...</p>;

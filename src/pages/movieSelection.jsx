@@ -1,17 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRoom } from "../hooks/useRoom";
 import { searchMovies } from "../services/tmdb";
-import { addMovieToPool } from "../services/rooms";
+import { addMovieToPool, startVoting } from "../services/rooms";
 import { useMoviePool } from "../hooks/useMoviePool";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 function MovieSelection() {
   const { roomCode } = useParams();
-  console.log("Room code:", roomCode);
+  const { room } = useRoom(roomCode);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
   const [addingMovieId, setAddingMovieId] = useState(null);
+  const { user } = useAuth();
+
+  const uid = user?.uid;
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+  if (room?.status === "voting") {
+    navigate(`/voting/${roomCode}`);
+  }
+}, [room?.status, roomCode, navigate]);
 
   const {
     movies,
@@ -36,6 +48,28 @@ function MovieSelection() {
       setError("Something went wrong while searching.");
     } finally {
       setSearching(false);
+    }
+  }
+
+  async function handleStartVoting() {
+    try {
+      setError("");
+
+      await startVoting(roomCode, uid);
+
+      navigate(`/voting/${roomCode}`);
+    } catch (err) {
+      console.error("Start voting error:", err);
+
+      if (err.message === "NOT_HOST") {
+        setError("Only the host can start voting.");
+      } else if (err.message === "ROOM_NOT_FOUND") {
+        setError("Room not found.");
+      } else if (err.message === "INVALID_STATUS") {
+        setError("Voting cannot be started from the current room status.");
+      } else {
+        setError("Failed to start voting.");
+      }
     }
   }
 
@@ -166,7 +200,10 @@ function MovieSelection() {
 
       <hr />
 
-      <button disabled={!canStartVoting}>
+      <button
+        onClick={handleStartVoting}
+        disabled={!canStartVoting || !uid}
+      >
         Start Voting
       </button>
 

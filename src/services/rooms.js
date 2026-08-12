@@ -88,3 +88,29 @@ export async function addMovieToPool(roomCode, movie) {
     releaseDate: movie.release_date ?? null,
   });
 }
+
+export async function startVoting(roomCode, uid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+
+  const roomSnapshot = await getDoc(roomRef);
+
+  if (!roomSnapshot.exists()) {
+    throw new Error("ROOM_NOT_FOUND");
+  }
+
+  const roomData = roomSnapshot.data();
+
+  if (roomData.hostUid !== uid) {
+    throw new Error("NOT_HOST");
+  }
+
+  if (roomData.status !== "lobby") {
+    throw new Error("INVALID_STATUS");
+  }
+
+  await updateDoc(roomRef, {
+    status: "voting",
+  });
+}
