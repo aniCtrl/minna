@@ -6,6 +6,9 @@ import { useMoviePool } from "../hooks/useMoviePool";
 import { useAllVotes } from "../hooks/useAllVotes";
 import { computeMatches } from "../services/votes";
 
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
+
 function Results() {
   const { roomCode } = useParams();
 
@@ -34,19 +37,19 @@ function Results() {
     moviesLoading ||
     votesLoading
   ) {
-    return <p>Loading results...</p>;
+    return <LoadingState message="Loading results..." />;
   }
 
   if (roomError) {
-    return <p>{roomError}</p>;
+    return <ErrorState message={roomError} />;
   }
 
   if (moviesError) {
-    return <p>{moviesError}</p>;
+    return <ErrorState message={moviesError} />;
   }
 
   if (votesError) {
-    return <p>{votesError}</p>;
+    return <ErrorState message={votesError} />;
   }
 
   const matches = computeMatches(
