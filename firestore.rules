@@ -3,24 +3,124 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // -----------------------------------------
+    // ROOMS
+    // -----------------------------------------
+
     match /rooms/{roomCode} {
 
+      // Any authenticated user can read a room.
       allow read: if request.auth != null;
 
+      // Authenticated user can create a room
+      // only if they make themselves the host
+      // and the room starts in the lobby.
+      allow create: if request.auth != null
+        && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.status == "lobby";
+
+      // Only the host can move the room through
+      // the allowed state transitions.
+      allow update: if request.auth != null
+  && request.resource.data.hostUid == resource.data.hostUid
+  && (
+    // Host can change the room status
+    (
+      request.auth.uid == resource.data.hostUid
+      &&
+      (
+        (
+          resource.data.status == "lobby" &&
+          request.resource.data.status == "voting"
+        ) ||
+        (
+          resource.data.status == "voting" &&
+          request.resource.data.status == "results"
+        )
+      )
+    )
+
+    ||
+
+    // Any authenticated user can add themselves to members
+        (
+          resource.data.status == "lobby"
+          &&
+          request.resource.data.status == resource.data.status
+          &&
+          request.resource.data.members.diff(resource.data.members)
+            .affectedKeys().hasOnly([request.auth.uid])
+          &&
+          request.resource.data.members[request.auth.uid] != null
+        )
+  );
     }
+
+
+    // -----------------------------------------
+    // MEMBERS
+    // -----------------------------------------
+
+    match /rooms/{roomCode}/members/{memberUid} {
+
+      // Authenticated users can see members.
+      allow read: if request.auth != null;
+
+      // A user can only add themselves.
+      allow create: if request.auth != null
+        && request.auth.uid == memberUid;
+
+      // Members cannot modify or delete member records.
+      allow update, delete: if false;
+    }
+
+
+    // -----------------------------------------
+    // MOVIES
+    // -----------------------------------------
+
+    match /rooms/{roomCode}/movies/{movieId} {
+
+      // Authenticated users can see the movie pool.
+      allow read: if request.auth != null;
+
+      // Only the host can add movies.
+      allow create: if request.auth != null
+        && request.auth.uid ==
+          get(
+            /databases/$(database)/documents/rooms/$(roomCode)
+          ).data.hostUid;
+
+      // Movies are not edited/deleted by users.
+      allow update, delete: if false;
+    }
+
+
+    // -----------------------------------------
+    // VOTES
+    // -----------------------------------------
+
+    match /rooms/{roomCode}/votes/{voteId} {
+
+      // Authenticated users can read votes.
+      allow read: if request.auth != null;
+
+      // A user can only create/update a vote
+      // belonging to themselves.
+      allow create, update: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+
+      // Votes cannot be deleted.
+      allow delete: if false;
+    }
+
+
+    // -----------------------------------------
+    // DEFAULT DENY
+    // -----------------------------------------
 
     match /{document=**} {
       allow read, write: if false;
     }
   }
-}
-
-
-match /members/{memberUid} {
-
-  allow read: if request.auth != null;
-
-  allow create: if request.auth != null
-    && request.auth.uid == memberUid;
-
 }
