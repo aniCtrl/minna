@@ -49,9 +49,7 @@ function Voting() {
     movies.length > 0 && !currentMovie;
 
   useEffect(() => {
-    if (completedVoting) {
-      console.log("User has voted on every movie.");
-    }
+    
   }, [completedVoting]);
 
   useEffect(() => {

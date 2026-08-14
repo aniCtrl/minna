@@ -44,10 +44,6 @@ export function useVotingCompletion({
 
         const currentVotes = snapshot.size;
 
-        console.log(
-          `Voting progress: ${currentVotes}/${requiredVotes}`
-        );
-
         if (currentVotes !== requiredVotes) {
           return;
         }
