@@ -81,18 +81,19 @@ service cloud.firestore {
 
     match /rooms/{roomCode}/movies/{movieId} {
 
-      // Authenticated users can see the movie pool.
-      allow read: if request.auth != null;
+    // Authenticated users can see the movie pool.
+    allow read: if request.auth != null;
 
-      // Any authenticated member can add movies while the room is in the lobby.
-      allow create: if isAuthenticated()
-      && exists(
-        /databases/$(database)/documents/rooms/$(roomCode)/members/$(request.auth.uid)
-      )
+    // Any authenticated member of the room
+    // can add movies while the room is in the lobby.
+    allow create: if request.auth != null
       && get(
         /databases/$(database)/documents/rooms/$(roomCode)
-      ).data.status == "lobby";
-    }
+      ).data.status == "lobby"
+      && get(
+        /databases/$(database)/documents/rooms/$(roomCode)
+      ).data.members[request.auth.uid] != null;
+  }
 
     // -----------------------------------------
     // VOTES
