@@ -32,8 +32,12 @@ function Results() {
     error: votesError,
   } = useAllVotes(roomCode);
 
-  if (roomLoading || moviesLoading || votesLoading) {
-    return null;
+  if (
+    roomLoading ||
+    moviesLoading ||
+    votesLoading
+  ) {
+    return <LoadingState message="Loading results..." />;
   }
 
   if (roomError) {
