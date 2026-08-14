@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import FirebaseTest from "./pages/FirebaseTest";
-
 import Landing from "./pages/Landing";
 import CreateRoom from "./pages/CreateRoom";
 import JoinRoom from "./pages/JoinRoom";
@@ -20,7 +18,6 @@ function App() {
         <Route path="/movie-selection/:roomCode" element={<MovieSelection />} />
         <Route path="/voting/:roomCode" element={<Voting />} />
         <Route path="/results/:roomCode" element={<Results />} />
-        <Route path="/firebase-test" element={<FirebaseTest />} />
         <Route path="/lobby/:roomCode" element={<Lobby />} />
       </Routes>
     </BrowserRouter>
