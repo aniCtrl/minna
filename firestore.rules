@@ -84,17 +84,15 @@ service cloud.firestore {
       // Authenticated users can see the movie pool.
       allow read: if request.auth != null;
 
-      // Only the host can add movies.
-      allow create: if request.auth != null
-        && request.auth.uid ==
-          get(
-            /databases/$(database)/documents/rooms/$(roomCode)
-          ).data.hostUid;
-
-      // Movies are not edited/deleted by users.
-      allow update, delete: if false;
+      // Any authenticated member can add movies while the room is in the lobby.
+      allow create: if isAuthenticated()
+      && exists(
+        /databases/$(database)/documents/rooms/$(roomCode)/members/$(request.auth.uid)
+      )
+      && get(
+        /databases/$(database)/documents/rooms/$(roomCode)
+      ).data.status == "lobby";
     }
-
 
     // -----------------------------------------
     // VOTES
