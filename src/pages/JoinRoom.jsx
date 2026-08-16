@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { joinRoom } from "../services/rooms";
 
 function JoinRoom() {
-
   const navigate = useNavigate();
+  const { roomCode: inviteRoomCode } = useParams();
 
   const { user, loading } = useAuth();
 
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState( inviteRoomCode?.toUpperCase() || "" );
   const [joining, setJoining] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -57,12 +57,12 @@ function JoinRoom() {
       <input
         type="text"
         value={roomCode}
-        onChange={(event) => setRoomCode(event.target.value)}
+        onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
         placeholder="Enter room code"
         maxLength={6}
       />
 
-      <button onClick={handleJoinRoom} disabled={joining}>
+      <button onClick={handleJoinRoom} disabled={joining || !roomCode.trim()}>
         {joining ? "Joining..." : "Join Room"}
       </button>
 

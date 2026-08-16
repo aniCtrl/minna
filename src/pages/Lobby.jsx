@@ -3,6 +3,8 @@ import { useMembers } from "../hooks/useMembers";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import RoomCodeDisplay from "../components/RoomCodeDisplay";
+
 
 function Lobby() {
   const { roomCode } = useParams();
@@ -32,7 +34,7 @@ function Lobby() {
     <div>
       <h1>Movie Night Lobby</h1>
 
-      <h2>Room Code: {room.id}</h2>
+      <RoomCodeDisplay roomCode={roomCode} />
 
       <p>Status: {room.status}</p>
 

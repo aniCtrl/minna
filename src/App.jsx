@@ -15,6 +15,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/create" element={<CreateRoom />} />
         <Route path="/join" element={<JoinRoom />} />
+        <Route path="/join/:roomCode" element={<JoinRoom />} />
         <Route path="/movie-selection/:roomCode" element={<MovieSelection />} />
         <Route path="/voting/:roomCode" element={<Voting />} />
         <Route path="/results/:roomCode" element={<Results />} />
