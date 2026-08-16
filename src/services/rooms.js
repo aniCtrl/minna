@@ -1,4 +1,12 @@
-import { doc, getDoc, setDoc, updateDoc, runTransaction } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  runTransaction,
+  Timestamp,
+} from "firebase/firestore";
+
 import { db } from "../firebase/config";
 
 function generateRoomCode(length = 6) {
@@ -19,10 +27,15 @@ export async function createRoom(hostUid, displayName) {
 
   const roomRef = doc(db, "rooms", roomCode);
 
+  const expiresAt = Timestamp.fromMillis(
+    Date.now() + 24 * 60 * 60 * 1000
+  );
+
   await setDoc(roomRef, {
     hostUid,
     status: "lobby",
     createdAt: new Date().toISOString(),
+    expiresAt,
     members: {
       [hostUid]: {
         displayName,
