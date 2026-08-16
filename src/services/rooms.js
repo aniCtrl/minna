@@ -26,21 +26,25 @@ export async function createRoom(hostUid, displayName) {
   const roomCode = generateRoomCode();
 
   const roomRef = doc(db, "rooms", roomCode);
-
-  const expiresAt = Timestamp.fromMillis(
-    Date.now() + 24 * 60 * 60 * 1000
+  const hostMemberRef = doc(
+    db,
+    "rooms",
+    roomCode,
+    "members",
+    hostUid
   );
 
   await setDoc(roomRef, {
     hostUid,
     status: "lobby",
-    createdAt: new Date().toISOString(),
-    expiresAt,
-    members: {
-      [hostUid]: {
-        displayName,
-      },
-    },
+    createdAt: Timestamp.now(),
+    expiresAt: Timestamp.fromMillis(
+      Date.now() + 24 * 60 * 60 * 1000
+    ),
+  });
+
+  await setDoc(hostMemberRef, {
+    displayName,
   });
 
   return roomCode;
@@ -62,16 +66,22 @@ export async function joinRoom(roomCode, uid, displayName) {
     throw new Error("ROOM_NOT_JOINABLE");
   }
 
-  const alreadyMember = roomData.members?.[uid];
+  const memberRef = doc(
+    db,
+    "rooms",
+    normalizedCode,
+    "members",
+    uid
+  );
 
-  if (alreadyMember) {
+  const memberSnap = await getDoc(memberRef);
+
+  if (memberSnap.exists()) {
     return normalizedCode;
   }
 
-  await updateDoc(roomRef, {
-    [`members.${uid}`]: {
-      displayName,
-    },
+  await setDoc(memberRef, {
+    displayName,
   });
 
   return normalizedCode;
@@ -100,11 +110,13 @@ export async function addMovieToPool(roomCode, movie, details) {
     posterPath: movie.poster_path ?? null,
     releaseDate: movie.release_date ?? null,
 
-    runtime: details.runtime ?? null,
+    runtime: details?.runtime ?? null,
 
-    genres: details.genres?.map((genre) => genre.name) ?? [],
+    genres: details?.genres
+      ? details.genres.map((genre) => genre.name)
+      : [],
 
-    overview: details.overview ?? null,
+    overview: details?.overview ?? null,
   });
 }
 
@@ -158,6 +170,111 @@ export async function completeVoting(roomCode, hostUid) {
 
     transaction.update(roomRef, {
       status: "results",
+    });
+  });
+}
+
+/**
+ * Close a room.
+ *
+ * Only the current host can close the room.
+ */
+export async function closeRoom(roomCode, uid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+
+  await runTransaction(db, async (transaction) => {
+    const roomSnapshot = await transaction.get(roomRef);
+
+    if (!roomSnapshot.exists()) {
+      throw new Error("ROOM_NOT_FOUND");
+    }
+
+    const roomData = roomSnapshot.data();
+
+    if (roomData.hostUid !== uid) {
+      throw new Error("NOT_HOST");
+    }
+
+    if (roomData.status === "closed") {
+      return;
+    }
+
+    transaction.update(roomRef, {
+      status: "closed",
+    });
+  });
+}
+
+/**
+ * Claim host when the current host is no longer
+ * present in the room's members map.
+ *
+ * A transaction guarantees that if two members
+ * attempt this at nearly the same time, only one
+ * transaction can successfully change hostUid.
+ */
+export async function claimHost(roomCode, uid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+
+  await runTransaction(db, async (transaction) => {
+    const roomSnapshot = await transaction.get(roomRef);
+
+    if (!roomSnapshot.exists()) {
+      throw new Error("ROOM_NOT_FOUND");
+    }
+
+    const roomData = roomSnapshot.data();
+
+    if (roomData.status === "closed") {
+      throw new Error("ROOM_CLOSED");
+    }
+
+    const currentHostUid = roomData.hostUid;
+
+    if (!currentHostUid) {
+      throw new Error("NO_HOST");
+    }
+
+    if (currentHostUid === uid) {
+      throw new Error("ALREADY_HOST");
+    }
+
+    const oldHostMemberRef = doc(
+      db,
+      "rooms",
+      normalizedCode,
+      "members",
+      currentHostUid
+    );
+
+    const newHostMemberRef = doc(
+      db,
+      "rooms",
+      normalizedCode,
+      "members",
+      uid
+    );
+
+    const oldHostSnapshot =
+      await transaction.get(oldHostMemberRef);
+
+    const newHostSnapshot =
+      await transaction.get(newHostMemberRef);
+
+    if (oldHostSnapshot.exists()) {
+      throw new Error("HOST_STILL_PRESENT");
+    }
+
+    if (!newHostSnapshot.exists()) {
+      throw new Error("NOT_MEMBER");
+    }
+
+    transaction.update(roomRef, {
+      hostUid: uid,
     });
   });
 }
