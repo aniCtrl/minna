@@ -1,5 +1,4 @@
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-
 const TMDB_ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 
 export async function searchMovies(query) {
@@ -22,3 +21,20 @@ export async function searchMovies(query) {
   return data.results;
 }
 
+export async function getMovieDetails(movieId) {
+  const response = await fetch(
+    `${TMDB_BASE_URL}/movie/${movieId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`,
+        accept: "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch movie details from TMDB");
+  }
+
+  return response.json();
+}
