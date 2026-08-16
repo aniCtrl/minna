@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { createRoom } from "../services/rooms";
 
+import { useNavigate } from "react-router-dom";
+
 function CreateRoom() {
   const { user, loading } = useAuth();
 
-  const [roomCode, setRoomCode] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   async function handleCreateRoom() {
     if (!user) return;
@@ -18,7 +21,9 @@ function CreateRoom() {
 
       const code = await createRoom(user.uid, "Anonymous User");
 
-      setRoomCode(code);
+      
+      navigate(`/lobby/${code}`);
+
     } catch (error) {
       console.error("Room creation failed:", error);
       setError("Failed to create room.");
@@ -39,12 +44,6 @@ function CreateRoom() {
         {creating ? "Creating..." : "Create Room"}
       </button>
 
-      {roomCode && (
-        <div>
-          <h2>Room Created!</h2>
-          <p>Room Code: {roomCode}</p>
-        </div>
-      )}
 
       {error && <p>{error}</p>}
     </div>
