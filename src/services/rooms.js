@@ -26,26 +26,22 @@ export async function createRoom(hostUid, displayName) {
   const roomCode = generateRoomCode();
 
   const roomRef = doc(db, "rooms", roomCode);
-  const hostMemberRef = doc(
-    db,
-    "rooms",
-    roomCode,
-    "members",
-    hostUid
-  );
 
-  await setDoc(roomRef, {
+  const roomData = {
     hostUid,
     status: "lobby",
     createdAt: Timestamp.now(),
     expiresAt: Timestamp.fromMillis(
       Date.now() + 24 * 60 * 60 * 1000
     ),
-  });
+    members: {
+      [hostUid]: {
+        displayName,
+      },
+    },
+  };
 
-  await setDoc(hostMemberRef, {
-    displayName,
-  });
+  await setDoc(roomRef, roomData);
 
   return roomCode;
 }
@@ -66,22 +62,16 @@ export async function joinRoom(roomCode, uid, displayName) {
     throw new Error("ROOM_NOT_JOINABLE");
   }
 
-  const memberRef = doc(
-    db,
-    "rooms",
-    normalizedCode,
-    "members",
-    uid
-  );
+  const alreadyMember = roomData.members?.[uid];
 
-  const memberSnap = await getDoc(memberRef);
-
-  if (memberSnap.exists()) {
+  if (alreadyMember) {
     return normalizedCode;
   }
 
-  await setDoc(memberRef, {
-    displayName,
+  await updateDoc(roomRef, {
+    [`members.${uid}`]: {
+      displayName,
+    },
   });
 
   return normalizedCode;
