@@ -77,7 +77,7 @@ export async function joinRoom(roomCode, uid, displayName) {
   return normalizedCode;
 }
 
-export async function addMovieToPool(roomCode, movie) {
+export async function addMovieToPool(roomCode, movie, details) {
   const normalizedCode = roomCode.trim().toUpperCase();
 
   const movieRef = doc(
@@ -99,6 +99,12 @@ export async function addMovieToPool(roomCode, movie) {
     title: movie.title,
     posterPath: movie.poster_path ?? null,
     releaseDate: movie.release_date ?? null,
+
+    runtime: details.runtime ?? null,
+
+    genres: details.genres?.map((genre) => genre.name) ?? [],
+
+    overview: details.overview ?? null,
   });
 }
 

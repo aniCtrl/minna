@@ -1,9 +1,11 @@
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 
-export async function searchMovies(query) {
+export async function searchMovies(query, page = 1) {
   const response = await fetch(
-    `${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`,
+    `${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(
+      query
+    )}&page=${page}`,
     {
       headers: {
         Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`,
@@ -18,7 +20,11 @@ export async function searchMovies(query) {
 
   const data = await response.json();
 
-  return data.results;
+  return {
+    results: data.results,
+    page: data.page,
+    totalPages: data.total_pages,
+  };
 }
 
 export async function getMovieDetails(movieId) {

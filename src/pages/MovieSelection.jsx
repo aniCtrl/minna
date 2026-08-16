@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRoom } from "../hooks/useRoom";
-import { searchMovies } from "../services/tmdb";
+import { searchMovies, getMovieDetails } from "../services/tmdb";
 import { addMovieToPool, startVoting } from "../services/rooms";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +11,9 @@ function MovieSelection() {
   const { room } = useRoom(roomCode);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [searchPage, setSearchPage] = useState(1);
+  const [totalSearchPages, setTotalSearchPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
@@ -44,15 +47,45 @@ function MovieSelection() {
       setSearchResults([]);
       setHasSearched(false);
 
-      const results = await searchMovies(query);
+      const data = await searchMovies(query, 1);
 
-      setSearchResults(results);
+      setSearchResults(data.results);
+      setSearchPage(data.page);
+      setTotalSearchPages(data.totalPages);
       setHasSearched(true);
     } catch (err) {
       console.error("Movie search error:", err);
       setError("Something went wrong while searching.");
     } finally {
       setSearching(false);
+    }
+  }
+
+  async function handleLoadMore() {
+    if (loadingMore || searchPage >= totalSearchPages) {
+      return;
+    }
+
+    try {
+      setLoadingMore(true);
+      setError("");
+
+      const nextPage = searchPage + 1;
+
+      const data = await searchMovies(query, nextPage);
+
+      setSearchResults((currentResults) => [
+        ...currentResults,
+        ...data.results,
+      ]);
+
+      setSearchPage(data.page);
+      setTotalSearchPages(data.totalPages);
+    } catch (err) {
+      console.error("Load more movies error:", err);
+      setError("Failed to load more movies.");
+    } finally {
+      setLoadingMore(false);
     }
   }
 
@@ -88,7 +121,9 @@ function MovieSelection() {
       setAddingMovieId(movie.id);
       setError("");
 
-      await addMovieToPool(roomCode, movie);
+      const details = await getMovieDetails(movie.id);
+
+      await addMovieToPool(roomCode, movie, details);
     } catch (err) {
       console.error("Add movie error:", err);
 
@@ -177,7 +212,18 @@ function MovieSelection() {
               </button>
             </div>
           );
-        })}
+        }
+        )}
+        {hasSearched &&
+          searchResults.length > 0 &&
+          searchPage < totalSearchPages && (
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+            >
+              {loadingMore ? "Loading..." : "Load More"}
+            </button>
+          )}
       </div>
 
       <hr />
@@ -202,6 +248,22 @@ function MovieSelection() {
             <p>
               {movie.releaseDate || "Release date unknown"}
             </p>
+
+            <p>
+              {movie.runtime
+                ? `${movie.runtime} min`
+                : "Runtime unavailable"}
+            </p>
+
+            <p>
+              {movie.genres?.length > 0
+                ? movie.genres.join(", ")
+                : "Genres unavailable"}
+            </p>
+
+            {movie.overview && (
+              <p>{movie.overview}</p>
+            )}
           </div>
         ))}
       </div>
