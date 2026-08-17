@@ -161,4 +161,105 @@ describe("computeMatches", () => {
 
     expect(matches).toEqual([]);
   });
+
+  it("returns a movie when more than half the members like it in majority mode", () => {
+    const movies = [
+      {
+        id: 1,
+        title: "Inception",
+      },
+    ];
+
+    const members = [
+      { uid: "user1" },
+      { uid: "user2" },
+      { uid: "user3" },
+      { uid: "user4" },
+    ];
+
+    const votes = {
+      "user1_1": {
+        uid: "user1",
+        movieId: "1",
+        vote: "like",
+      },
+      "user2_1": {
+        uid: "user2",
+        movieId: "1",
+        vote: "like",
+      },
+      "user3_1": {
+        uid: "user3",
+        movieId: "1",
+        vote: "like",
+      },
+      "user4_1": {
+        uid: "user4",
+        movieId: "1",
+        vote: "dislike",
+      },
+    };
+
+    const matches = computeMatches(
+      movies,
+      votes,
+      members,
+      "majority"
+    );
+
+    expect(matches).toEqual([
+      {
+        id: 1,
+        title: "Inception",
+      },
+    ]);
+  });
+
+  it("does not return a movie when half or fewer members like it in majority mode", () => {
+    const movies = [
+      {
+        id: 1,
+        title: "Inception",
+      },
+    ];
+
+    const members = [
+      { uid: "user1" },
+      { uid: "user2" },
+      { uid: "user3" },
+      { uid: "user4" },
+    ];
+
+    const votes = {
+      "user1_1": {
+        uid: "user1",
+        movieId: "1",
+        vote: "like",
+      },
+      "user2_1": {
+        uid: "user2",
+        movieId: "1",
+        vote: "like",
+      },
+      "user3_1": {
+        uid: "user3",
+        movieId: "1",
+        vote: "dislike",
+      },
+      "user4_1": {
+        uid: "user4",
+        movieId: "1",
+        vote: "dislike",
+      },
+    };
+
+    const matches = computeMatches(
+      movies,
+      votes,
+      members,
+      "majority"
+    );
+
+    expect(matches).toEqual([]);
+  });
 });

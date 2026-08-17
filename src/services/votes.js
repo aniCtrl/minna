@@ -22,15 +22,25 @@ export async function castVote(roomCode, uid, movieId, vote) {
   });
 }
 
-export function computeMatches(movies, votes, members) {
+export function computeMatches(
+  movies,
+  votes,
+  members,
+  mode = "strict"
+) {
   const matches = movies.filter((movie) => {
-    return members.every((member) => {
+    const likeCount = members.filter((member) => {
       const voteId = `${member.uid}_${movie.id}`;
-
       const vote = votes[voteId];
 
       return vote?.vote === "like";
-    });
+    }).length;
+
+    if (mode === "majority") {
+      return likeCount > members.length / 2;
+    }
+
+    return likeCount === members.length;
   });
 
   return matches;

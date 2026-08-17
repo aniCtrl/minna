@@ -22,7 +22,11 @@ function generateRoomCode(length = 6) {
   return code;
 }
 
-export async function createRoom(hostUid, displayName) {
+export async function createRoom(
+  hostUid,
+  displayName,
+  matchMode = "strict"
+) {
   const roomCode = generateRoomCode();
 
   const roomRef = doc(db, "rooms", roomCode);
@@ -30,6 +34,7 @@ export async function createRoom(hostUid, displayName) {
   const roomData = {
     hostUid,
     status: "lobby",
+    matchMode,
     createdAt: Timestamp.now(),
     expiresAt: Timestamp.fromMillis(
       Date.now() + 24 * 60 * 60 * 1000

@@ -9,6 +9,7 @@ function CreateRoom() {
 
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [matchMode, setMatchMode] = useState("strict");
 
   const navigate = useNavigate();
 
@@ -19,9 +20,13 @@ function CreateRoom() {
       setCreating(true);
       setError("");
 
-      const code = await createRoom(user.uid, "Anonymous User");
+  const code = await createRoom(
+    user.uid,
+    "Anonymous User",
+    matchMode
+  );
 
-      
+
       navigate(`/lobby/${code}`);
 
     } catch (error) {
@@ -39,6 +44,32 @@ function CreateRoom() {
   return (
     <div>
       <h1>Create Room</h1>
+
+      <div>
+        <h2>Match Mode</h2>
+
+        <label>
+          <input
+            type="radio"
+            value="strict"
+            checked={matchMode === "strict"}
+            onChange={(event) => setMatchMode(event.target.value)}
+          />
+          Everyone must like it
+        </label>
+
+        <br />
+
+        <label>
+          <input
+            type="radio"
+            value="majority"
+            checked={matchMode === "majority"}
+            onChange={(event) => setMatchMode(event.target.value)}
+          />
+          More than half must like it
+        </label>
+      </div>
 
       <button onClick={handleCreateRoom} disabled={creating}>
         {creating ? "Creating..." : "Create Room"}
