@@ -155,10 +155,14 @@ function Voting() {
   if (completedVoting) {
     return (
       <div>
-        <h1>Voting Complete 🎉</h1>
+        <h1>You're done! 🎉</h1>
 
         <p>
-          You have voted on all {movies.length} movies.
+          You voted on all {movies.length} movies.
+        </p>
+
+        <p>
+          Waiting for the other players to finish voting...
         </p>
       </div>
     );
@@ -167,7 +171,7 @@ function Voting() {
   const isVoting =
     votingMovieId === currentMovie.id;
 
-    return (
+  return (
     <div>
       <h1>Vote</h1>
 

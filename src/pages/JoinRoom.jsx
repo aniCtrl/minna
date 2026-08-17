@@ -9,10 +9,12 @@ function JoinRoom() {
 
   const { user, loading } = useAuth();
 
-  const [roomCode, setRoomCode] = useState( inviteRoomCode?.toUpperCase() || "" );
+  const [roomCode, setRoomCode] = useState(inviteRoomCode?.toUpperCase() || "");
   const [joining, setJoining] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [displayName, setDisplayName] = useState("");
+
 
   async function handleJoinRoom() {
     if (!user || !roomCode.trim()) {
@@ -27,7 +29,7 @@ function JoinRoom() {
       const joinedRoomCode = await joinRoom(
         roomCode,
         user.uid,
-        "Anonymous User"
+        displayName.trim() || "Guest"
       );
 
       navigate(`/lobby/${joinedRoomCode}`);
@@ -53,6 +55,21 @@ function JoinRoom() {
   return (
     <div>
       <h1>Join Room</h1>
+
+      <div>
+        <label htmlFor="displayName">
+          Your Name
+        </label>
+
+        <input
+          id="displayName"
+          type="text"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          placeholder="Enter your name"
+          maxLength={30}
+        />
+      </div>
 
       <input
         type="text"

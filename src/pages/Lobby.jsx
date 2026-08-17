@@ -75,7 +75,11 @@ function Lobby() {
 
       <RoomCodeDisplay roomCode={roomCode} />
 
-      <p>Status: {room.status}</p>
+      {room.status === "lobby" && (
+        <p>
+          Waiting for everyone to join and get ready.
+        </p>
+      )}
 
       <h3>Members</h3>
 

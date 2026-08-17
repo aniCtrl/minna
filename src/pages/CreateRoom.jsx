@@ -10,6 +10,7 @@ function CreateRoom() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const [matchMode, setMatchMode] = useState("strict");
+  const [displayName, setDisplayName] = useState("");
 
   const navigate = useNavigate();
 
@@ -20,11 +21,11 @@ function CreateRoom() {
       setCreating(true);
       setError("");
 
-  const code = await createRoom(
-    user.uid,
-    "Anonymous User",
-    matchMode
-  );
+      const code = await createRoom(
+        user.uid,
+        displayName.trim() || "Guest",
+        matchMode
+      );
 
 
       navigate(`/lobby/${code}`);
@@ -46,7 +47,22 @@ function CreateRoom() {
       <h1>Create Room</h1>
 
       <div>
+        <h2>Your Name</h2>
+
+        <input
+          type="text"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          placeholder="Enter your name"
+          maxLength={30}
+        />
+      </div>
+      <div>
         <h2>Match Mode</h2>
+
+        <p>
+          Choose how movies become matches after everyone votes.
+        </p>
 
         <label>
           <input
