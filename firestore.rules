@@ -13,7 +13,8 @@ service cloud.firestore {
 
       allow create: if request.auth != null
         && request.resource.data.hostUid == request.auth.uid
-        && request.resource.data.status == "lobby";
+        && request.resource.data.status == "lobby"
+        && request.resource.data.matchMode in ["strict", "majority"];
 
       allow update: if request.auth != null
         && (
@@ -26,6 +27,8 @@ service cloud.firestore {
             request.auth.uid == resource.data.hostUid
             &&
             request.resource.data.hostUid == resource.data.hostUid
+            &&
+            request.resource.data.matchMode == resource.data.matchMode
             &&
             (
               // lobby -> voting

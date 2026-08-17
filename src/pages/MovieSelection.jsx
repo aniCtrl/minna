@@ -123,7 +123,13 @@ function MovieSelection() {
       setAddingMovieId(movie.id);
       setError("");
 
-      const details = await getMovieDetails(movie.id);
+      let details = null;
+
+      try {
+        details = await getMovieDetails(movie.id);
+      } catch (err) {
+        console.warn("Movie details unavailable. Adding with search data.", err);
+      }
 
       await addMovieToPool(roomCode, movie, details);
     } catch (err) {
