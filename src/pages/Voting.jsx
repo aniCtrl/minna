@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { useAuth } from "../hooks/useAuth";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useVotes } from "../hooks/useVotes";
-import { castVote } from "../services/votes";
-
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useVotingCompletion } from "../hooks/useVotingCompletion";
+import { useSwipeGesture } from "../hooks/useSwipeGesture";
+
+import { castVote } from "../services/votes";
 
 function Voting() {
   const { roomCode } = useParams();
@@ -48,21 +50,9 @@ function Voting() {
   const completedVoting =
     movies.length > 0 && !currentMovie;
 
-  useEffect(() => {
-    
-  }, [completedVoting]);
-
-  useEffect(() => {
-    if (room?.status === "results") {
-      navigate(`/results/${roomCode}`);
-    }
-  }, [room?.status, roomCode, navigate]);
-
-  
-
   async function handleVote(movie, vote) {
     if (!user?.uid) {
-      setError("You must be signed in to vote.");
+      setError("Unable to identify your player.");
       return;
     }
 
@@ -83,6 +73,33 @@ function Voting() {
       setVotingMovieId(null);
     }
   }
+
+  const {
+    deltaX,
+    isDragging,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+  } = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (currentMovie) {
+        handleVote(currentMovie, "dislike");
+      }
+    },
+
+    onSwipeRight: () => {
+      if (currentMovie) {
+        handleVote(currentMovie, "like");
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (room?.status === "results") {
+      navigate(`/results/${roomCode}`);
+    }
+  }, [room?.status, roomCode, navigate]);
 
   const isHost =
     Boolean(user?.uid) &&
@@ -147,6 +164,9 @@ function Voting() {
     );
   }
 
+  const isVoting =
+    votingMovieId === currentMovie.id;
+
   return (
     <div>
       <h1>Vote</h1>
@@ -160,12 +180,29 @@ function Voting() {
         {movies.length}
       </p>
 
-      <div>
+      <div
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        style={{
+          transform: `translateX(${deltaX}px) rotate(${deltaX * 0.05}deg)`,
+          transition: isDragging
+            ? "none"
+            : "transform 0.3s ease",
+          touchAction: "none",
+          cursor: isDragging
+            ? "grabbing"
+            : "grab",
+          userSelect: "none",
+        }}
+      >
         {currentMovie.posterPath && (
           <img
             src={`https://image.tmdb.org/t/p/w500${currentMovie.posterPath}`}
             alt={currentMovie.title}
             width="300"
+            draggable="false"
           />
         )}
 
@@ -179,18 +216,24 @@ function Voting() {
         <div>
           <button
             onClick={() =>
-              handleVote(currentMovie, "dislike")
+              handleVote(
+                currentMovie,
+                "dislike"
+              )
             }
-            disabled={votingMovieId === currentMovie.id}
+            disabled={isVoting}
           >
             👎 Dislike
           </button>
 
           <button
             onClick={() =>
-              handleVote(currentMovie, "like")
+              handleVote(
+                currentMovie,
+                "like"
+              )
             }
-            disabled={votingMovieId === currentMovie.id}
+            disabled={isVoting}
           >
             👍 Like
           </button>
