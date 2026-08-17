@@ -113,12 +113,6 @@ function MovieSelection() {
 
   async function handleAddMovie(movie) {
 
-    console.log("=== ADD MOVIE DEBUG ===");
-    console.log("UID:", uid);
-    console.log("Room code:", roomCode);
-    console.log("Room status:", room?.status);
-    console.log("Room members:", room?.members);
-    console.log("Is current UID a member:", room?.members?.[uid]);
 
     if (movies.length >= 10) {
       setError("You can only add 10 movies.");

@@ -167,7 +167,7 @@ function Voting() {
   const isVoting =
     votingMovieId === currentMovie.id;
 
-  return (
+    return (
     <div>
       <h1>Vote</h1>
 
@@ -180,46 +180,42 @@ function Voting() {
         {movies.length}
       </p>
 
-      <div
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        style={{
-          transform: `translateX(${deltaX}px) rotate(${deltaX * 0.05}deg)`,
-          transition: isDragging
-            ? "none"
-            : "transform 0.3s ease",
-          touchAction: "none",
-          cursor: isDragging
-            ? "grabbing"
-            : "grab",
-          userSelect: "none",
-        }}
-      >
-        {currentMovie.posterPath && (
-          <img
-            src={`https://image.tmdb.org/t/p/w500${currentMovie.posterPath}`}
-            alt={currentMovie.title}
-            width="300"
-            draggable="false"
-          />
-        )}
+      <div>
+        <div
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          style={{
+            transform: `translateX(${deltaX}px) rotate(${deltaX * 0.05}deg)`,
+            transition: isDragging
+              ? "none"
+              : "transform 0.3s ease",
+            touchAction: "none",
+            cursor: isDragging ? "grabbing" : "grab",
+            userSelect: "none",
+          }}
+        >
+          {currentMovie.posterPath && (
+            <img
+              src={`https://image.tmdb.org/t/p/w500${currentMovie.posterPath}`}
+              alt={currentMovie.title}
+              width="300"
+              draggable="false"
+            />
+          )}
 
-        <h2>{currentMovie.title}</h2>
+          <h2>{currentMovie.title}</h2>
 
-        <p>
-          {currentMovie.releaseDate ||
-            "Release date unknown"}
-        </p>
+          <p>
+            {currentMovie.releaseDate || "Release date unknown"}
+          </p>
+        </div>
 
         <div>
           <button
             onClick={() =>
-              handleVote(
-                currentMovie,
-                "dislike"
-              )
+              handleVote(currentMovie, "dislike")
             }
             disabled={isVoting}
           >
@@ -228,10 +224,7 @@ function Voting() {
 
           <button
             onClick={() =>
-              handleVote(
-                currentMovie,
-                "like"
-              )
+              handleVote(currentMovie, "like")
             }
             disabled={isVoting}
           >
