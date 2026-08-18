@@ -149,160 +149,184 @@ function MovieSelection() {
   const isHost = uid && room?.hostUid === uid;
 
   return (
-    <div>
-      <h1>Movie Selection</h1>
+    <div className="window-box">
+      <div className="window-title-bar">
+        <span>Minna.exe - Movie Selection</span>
+        <button 
+          onClick={() => navigate(`/lobby/${roomCode}`)}
+          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+        >
+          X
+        </button>
+      </div>
+      <div className="window-content">
+        <h1 style={{ marginBottom: "12px" }}>Movie Selection</h1>
+        <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", marginBottom: "16px" }}>Room Code: {roomCode}</p>
 
-      <p>Room Code: {roomCode}</p>
-
-      <button onClick={() => navigate(`/lobby/${roomCode}`)}>
-        Back to Lobby
-      </button>
-
-      <hr />
-
-      <h2>Search Movies</h2>
-
-      <input
-        type="text"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            handleSearch();
-          }
-        }}
-        placeholder="Search for a movie..."
-      />
-
-      <button onClick={handleSearch} disabled={searching}>
-        {searching ? "Searching..." : "Search"}
-      </button>
-
-      {error && <p>{error}</p>}
-
-      {moviesError && <p>{moviesError}</p>}
-
-      <div>
-        {hasSearched && searchResults.length === 0 && !searching && (
-          <p>No movies found. Try a different search.</p>
-        )}
-        {searchResults.map((movie) => {
-          const alreadyAdded = movies.some(
-            (poolMovie) => poolMovie.tmdbId === movie.id
-          );
-
-          return (
-            <div key={movie.id}>
-              {movie.poster_path && (
-                <img
-                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                  alt={movie.title}
-                  width="150"
-                />
-              )}
-
-              <h3>{movie.title}</h3>
-
-              <p>
-                {movie.release_date || "Release date unknown"}
-              </p>
-
-              <button
-                onClick={() => handleAddMovie(movie)}
-                disabled={
-                  alreadyAdded ||
-                  movies.length >= 10 ||
-                  addingMovieId === movie.id
+        <div className="form-group">
+          <label htmlFor="searchQuery">Search Movies</label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              id="searchQuery"
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
                 }
-              >
-                {alreadyAdded
-                  ? "Added"
-                  : addingMovieId === movie.id
-                    ? "Adding..."
-                    : movies.length >= 10
-                      ? "Pool Full"
-                      : "Add"}
-              </button>
-            </div>
-          );
-        }
-        )}
+              }}
+              placeholder="Search for a movie..."
+            />
+            <button className="btn-primary" onClick={handleSearch} disabled={searching}>
+              {searching ? "Searching..." : "Search"}
+            </button>
+          </div>
+        </div>
+
+        {error && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{error}</p>}
+        {moviesError && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{moviesError}</p>}
+
+        <div className="movie-grid">
+          {hasSearched && searchResults.length === 0 && !searching && (
+            <p style={{ gridColumn: "1/-1" }}>No movies found. Try a different search.</p>
+          )}
+          {searchResults.map((movie) => {
+            const alreadyAdded = movies.some(
+              (poolMovie) => poolMovie.tmdbId === movie.id
+            );
+
+            return (
+              <div key={movie.id} className="movie-card">
+                {movie.poster_path ? (
+                  <img
+                    className="movie-poster"
+                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                    alt={movie.title}
+                  />
+                ) : (
+                  <div className="retro-inset movie-poster" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
+                    No Poster Image
+                  </div>
+                )}
+
+                <h3 style={{ fontSize: "13px", height: "36px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", marginTop: "4px" }}>
+                  {movie.title}
+                </h3>
+
+                <p style={{ fontSize: "11px", color: "#666" }}>
+                  {movie.release_date ? movie.release_date.split("-")[0] : "Unknown Year"}
+                </p>
+
+                <button
+                  onClick={() => handleAddMovie(movie)}
+                  disabled={
+                    alreadyAdded ||
+                    movies.length >= 10 ||
+                    addingMovieId === movie.id
+                  }
+                  style={{ width: "100%", marginTop: "auto" }}
+                >
+                  {alreadyAdded
+                    ? "Added"
+                    : addingMovieId === movie.id
+                      ? "Adding..."
+                      : movies.length >= 10
+                        ? "Pool Full"
+                        : "Add"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
         {hasSearched &&
           searchResults.length > 0 &&
           searchPage < totalSearchPages && (
             <button
               onClick={handleLoadMore}
               disabled={loadingMore}
+              style={{ width: "100%", marginTop: "16px" }}
             >
-              {loadingMore ? "Loading..." : "Load More"}
+              {loadingMore ? "Loading..." : "Load More Movies"}
             </button>
           )}
-      </div>
 
-      <hr />
+        <hr className="retro-divider" />
 
-      <h2>Movie Pool</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
+          <h2>Movie Pool</h2>
+          <span className="retro-chip tertiary">{movies.length} / 10 movies</span>
+        </div>
 
-      <p>
-        {movies.length} / 10 movies
-      </p>
+        {moviesLoading && <p>Loading movie pool...</p>}
 
-      {moviesLoading && <p>Loading movie pool...</p>}
+        {!moviesLoading && movies.length === 0 && (
+          <p style={{ fontStyle: "italic" }}>No movies added yet.</p>
+        )}
 
-      {!moviesLoading && movies.length === 0 && (
-        <p>No movies added yet.</p>
-      )}
+        <div className="movie-grid" style={{ marginBottom: "24px" }}>
+          {movies.map((movie) => (
+            <div key={movie.id} className="movie-card">
+              {movie.posterPath ? (
+                <img
+                  className="movie-poster"
+                  src={`https://image.tmdb.org/t/p/w200${movie.posterPath}`}
+                  alt={movie.title}
+                />
+              ) : (
+                <div className="retro-inset movie-poster" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
+                  No Poster Image
+                </div>
+              )}
+              
+              <h3 style={{ fontSize: "13px", marginTop: "4px" }}>{movie.title}</h3>
 
-      <div>
-        {movies.map((movie) => (
-          <div key={movie.id}>
-            <h3>{movie.title}</h3>
+              <div style={{ marginTop: "4px" }}>
+                {movie.releaseDate && (
+                  <span className="retro-chip" style={{ fontSize: "10px" }}>{movie.releaseDate.split("-")[0]}</span>
+                )}
+                {movie.runtime && (
+                  <span className="retro-chip secondary" style={{ fontSize: "10px" }}>{movie.runtime}m</span>
+                )}
+              </div>
 
-            <p>
-              {movie.releaseDate || "Release date unknown"}
-            </p>
+              {movie.genres?.slice(0, 2).map((genre) => (
+                <span key={genre} className="retro-chip tertiary" style={{ fontSize: "9px", display: "inline-block", marginTop: "4px" }}>
+                  {genre}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
 
-            <p>
-              {movie.runtime
-                ? `${movie.runtime} min`
-                : "Runtime unavailable"}
-            </p>
+        <hr className="retro-divider" />
 
-            <p>
-              {movie.genres?.length > 0
-                ? movie.genres.join(", ")
-                : "Genres unavailable"}
-            </p>
+        {isHost ? (
+          <>
+            <button
+              className="btn-primary"
+              onClick={handleStartVoting}
+              disabled={!canStartVoting}
+              style={{ width: "100%" }}
+            >
+              Start Voting
+            </button>
 
-            {movie.overview && (
-              <p>{movie.overview}</p>
+            {!canStartVoting && (
+              <p style={{ marginTop: "8px", fontStyle: "italic", textAlign: "center" }}>
+                Add at least 5 movies to start voting.
+              </p>
             )}
-          </div>
-        ))}
+          </>
+        ) : (
+          <p style={{ textAlign: "center", fontStyle: "italic" }}>
+            {canStartVoting
+              ? "Waiting for the host to start voting..."
+              : "Add at least 5 movies. The host will start voting."}
+          </p>
+        )}
       </div>
-
-      <hr />
-
-      {isHost ? (
-        <>
-          <button
-            onClick={handleStartVoting}
-            disabled={!canStartVoting}
-          >
-            Start Voting
-          </button>
-
-          {!canStartVoting && (
-            <p>Add at least 5 movies to start voting.</p>
-          )}
-        </>
-      ) : (
-        <p>
-          {canStartVoting
-            ? "Waiting for the host to start voting..."
-            : "Add at least 5 movies. The host will start voting."}
-        </p>
-      )}
     </div>
   );
 }
