@@ -55,7 +55,8 @@ function Results() {
   const matches = computeMatches(
     movies,
     votes,
-    members
+    members,
+    room?.matchMode
   );
 
   return (

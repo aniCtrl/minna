@@ -4,6 +4,7 @@ import {
   setDoc,
   updateDoc,
   runTransaction,
+  writeBatch,
   Timestamp,
 } from "firebase/firestore";
 
@@ -46,7 +47,15 @@ export async function createRoom(
     },
   };
 
-  await setDoc(roomRef, roomData);
+  const batch = writeBatch(db);
+
+  batch.set(roomRef, roomData);
+  batch.set(
+    doc(db, "rooms", roomCode, "members", hostUid),
+    { displayName }
+  );
+
+  await batch.commit();
 
   return roomCode;
 }
@@ -73,11 +82,19 @@ export async function joinRoom(roomCode, uid, displayName) {
     return normalizedCode;
   }
 
-  await updateDoc(roomRef, {
+  const batch = writeBatch(db);
+
+  batch.update(roomRef, {
     [`members.${uid}`]: {
       displayName,
     },
   });
+  batch.set(
+    doc(db, "rooms", normalizedCode, "members", uid),
+    { displayName }
+  );
+
+  await batch.commit();
 
   return normalizedCode;
 }
