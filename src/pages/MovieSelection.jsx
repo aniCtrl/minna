@@ -146,12 +146,17 @@ function MovieSelection() {
   }
 
   const canStartVoting = movies.length >= 5;
+  const isHost = uid && room?.hostUid === uid;
 
   return (
     <div>
       <h1>Movie Selection</h1>
 
       <p>Room Code: {roomCode}</p>
+
+      <button onClick={() => navigate(`/lobby/${roomCode}`)}>
+        Back to Lobby
+      </button>
 
       <hr />
 
@@ -278,15 +283,25 @@ function MovieSelection() {
 
       <hr />
 
-      <button
-        onClick={handleStartVoting}
-        disabled={!canStartVoting || !uid}
-      >
-        Start Voting
-      </button>
+      {isHost ? (
+        <>
+          <button
+            onClick={handleStartVoting}
+            disabled={!canStartVoting}
+          >
+            Start Voting
+          </button>
 
-      {!canStartVoting && (
-        <p>Add at least 5 movies to start voting.</p>
+          {!canStartVoting && (
+            <p>Add at least 5 movies to start voting.</p>
+          )}
+        </>
+      ) : (
+        <p>
+          {canStartVoting
+            ? "Waiting for the host to start voting..."
+            : "Add at least 5 movies. The host will start voting."}
+        </p>
       )}
     </div>
   );

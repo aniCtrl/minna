@@ -1,8 +1,24 @@
-function Landing(){
-  return(
+import { useNavigate } from "react-router-dom";
+
+function Landing() {
+  const navigate = useNavigate();
+
+  return (
     <div>
-      <h1>Landing Room</h1>
-      <p>This is the room for landing</p>
+      <h1>Minna</h1>
+
+      <p>
+        Pick movies together. Vote on your favorites. Find your
+        group's perfect match.
+      </p>
+
+      <button onClick={() => navigate("/create")}>
+        Create a Room
+      </button>
+
+      <button onClick={() => navigate("/join")}>
+        Join a Room
+      </button>
     </div>
   );
 }

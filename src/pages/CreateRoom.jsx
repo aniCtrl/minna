@@ -71,10 +71,11 @@ function CreateRoom() {
             checked={matchMode === "strict"}
             onChange={(event) => setMatchMode(event.target.value)}
           />
-          Everyone must like it
+          Everyone has to like it
         </label>
-
-        <br />
+        <p style={{ fontSize: "0.85em", color: "#666", marginTop: "4px", marginBottom: "12px", paddingLeft: "24px" }}>
+          Only movies liked by everyone become matches.
+        </p>
 
         <label>
           <input
@@ -83,8 +84,11 @@ function CreateRoom() {
             checked={matchMode === "majority"}
             onChange={(event) => setMatchMode(event.target.value)}
           />
-          More than half must like it
+          Most people have to like it
         </label>
+        <p style={{ fontSize: "0.85em", color: "#666", marginTop: "4px", marginBottom: "12px", paddingLeft: "24px" }}>
+          Movies liked by more than half the group become matches.
+        </p>
       </div>
 
       <button onClick={handleCreateRoom} disabled={creating}>

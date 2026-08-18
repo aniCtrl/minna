@@ -91,6 +91,12 @@ function Lobby() {
         ))}
       </ul>
 
+      {room.status === "lobby" && (
+        <button onClick={() => navigate(`/movie-selection/${roomCode}`)}>
+          Go to Movie Selection
+        </button>
+      )}
+
       {/* Room management */}
       <button onClick={handleCloseRoom}>
         Close Room
