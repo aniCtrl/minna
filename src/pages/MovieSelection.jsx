@@ -9,7 +9,7 @@ import { Film, Search, Plus, Check, Loader, X, Play } from "lucide-react";
 
 function MovieSelection() {
   const { roomCode } = useParams();
-  const { room } = useRoom(roomCode);
+  const { room, loading: roomLoading, error: roomError } = useRoom(roomCode);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchPage, setSearchPage] = useState(1);
@@ -19,6 +19,7 @@ function MovieSelection() {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
   const [addingMovieId, setAddingMovieId] = useState(null);
+  const [startingVoting, setStartingVoting] = useState(false);
   const { user } = useAuth();
 
   const uid = user?.uid;
@@ -35,6 +36,77 @@ function MovieSelection() {
     loading: moviesLoading,
     error: moviesError,
   } = useMoviePool(roomCode);
+
+  if (roomLoading || moviesLoading) {
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Minna.exe
+          </span>
+        </div>
+        <div className="window-content">
+          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <Loader size={16} className="spinner" /> Loading movie selection...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (roomError || moviesError) {
+    const activeError = roomError || moviesError;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Error.exe</span>
+        </div>
+        <div className="window-content">
+          <p style={{ color: "var(--color-error)" }}>{activeError}</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!room) {
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Not Found.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Room not found.</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (room.status === "closed") {
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Minna.exe
+          </span>
+        </div>
+        <div className="window-content center-container" style={{ padding: "24px" }}>
+          <h1 style={{ marginBottom: "12px" }}>Room Closed</h1>
+          <p style={{ marginBottom: "16px" }}>
+            This movie night session has been closed by the host.
+          </p>
+          <button className="btn-primary" onClick={() => navigate("/")}>
+            Start a New Room
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   async function handleSearch() {
     if (!query.trim()) {
@@ -91,7 +163,9 @@ function MovieSelection() {
   }
 
   async function handleStartVoting() {
+    if (startingVoting) return;
     try {
+      setStartingVoting(true);
       setError("");
 
       await startVoting(roomCode, uid);
@@ -109,6 +183,8 @@ function MovieSelection() {
       } else {
         setError("Failed to start voting.");
       }
+    } finally {
+      setStartingVoting(false);
     }
   }
 
@@ -319,10 +395,18 @@ function MovieSelection() {
             <button
               className="btn-primary"
               onClick={handleStartVoting}
-              disabled={!canStartVoting}
+              disabled={!canStartVoting || startingVoting}
               style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
             >
-              <Play size={14} /> Start Voting
+              {startingVoting ? (
+                <>
+                  <Loader size={14} className="spinner" /> Starting...
+                </>
+              ) : (
+                <>
+                  <Play size={14} /> Start Voting
+                </>
+              )}
             </button>
 
             {!canStartVoting && (

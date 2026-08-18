@@ -171,6 +171,43 @@ function Voting() {
     );
   }
 
+  if (!room) {
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Not Found.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Room not found.</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (room.status === "closed") {
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Minna.exe
+          </span>
+        </div>
+        <div className="window-content center-container" style={{ padding: "24px" }}>
+          <h1 style={{ marginBottom: "12px" }}>Room Closed</h1>
+          <p style={{ marginBottom: "16px" }}>
+            This movie night session has been closed by the host.
+          </p>
+          <button className="btn-primary" onClick={() => navigate("/")}>
+            Start a New Room
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (movies.length === 0) {
     return (
       <div className="window-box">
