@@ -19,12 +19,19 @@ function RoomCodeDisplay({ roomCode }) {
   }
 
   return (
-    <div>
-      <h2>Room Code: {roomCode}</h2>
-
-      <button onClick={handleCopyInviteLink}>
-        {copied ? "Copied!" : "Copy Invite Link"}
-      </button>
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "stretch", width: "100%", margin: "8px 0" }}>
+      <label style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600 }}>Room Code</label>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <div 
+          className="retro-inset" 
+          style={{ flex: 1, padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "18px", fontWeight: "bold", textAlign: "center", letterSpacing: "1px" }}
+        >
+          {roomCode}
+        </div>
+        <button onClick={handleCopyInviteLink} style={{ minWidth: "120px" }}>
+          {copied ? "Copied!" : "Copy Link"}
+        </button>
+      </div>
     </div>
   );
 }

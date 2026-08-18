@@ -49,43 +49,77 @@ function JoinRoom() {
   }
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Minna.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Loading session...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Join Room</h1>
-
-      <div>
-        <label htmlFor="displayName">
-          Your Name
-        </label>
-
-        <input
-          id="displayName"
-          type="text"
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-          placeholder="Enter your name"
-          maxLength={30}
-        />
+    <div className="window-box">
+      <div className="window-title-bar">
+        <span>Minna.exe - Join Room</span>
+        <button 
+          onClick={() => navigate("/")}
+          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+        >
+          X
+        </button>
       </div>
+      <div className="window-content">
+        <h1 style={{ marginBottom: "16px" }}>Join Room</h1>
 
-      <input
-        type="text"
-        value={roomCode}
-        onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
-        placeholder="Enter room code"
-        maxLength={6}
-      />
+        <div className="form-group">
+          <label htmlFor="displayName">Your Name</label>
+          <input
+            id="displayName"
+            type="text"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            placeholder="Enter your name"
+            maxLength={30}
+          />
+        </div>
 
-      <button onClick={handleJoinRoom} disabled={joining || !roomCode.trim()}>
-        {joining ? "Joining..." : "Join Room"}
-      </button>
+        <div className="form-group" style={{ marginTop: "16px" }}>
+          <label htmlFor="roomCode">Room Code</label>
+          <input
+            id="roomCode"
+            type="text"
+            value={roomCode}
+            onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
+            placeholder="Enter 6-character code"
+            maxLength={6}
+          />
+        </div>
 
-      {message && <p>{message}</p>}
+        <button 
+          className="btn-primary"
+          onClick={handleJoinRoom} 
+          disabled={joining || !roomCode.trim()}
+          style={{ width: "100%", marginTop: "24px" }}
+        >
+          {joining ? "Joining..." : "Join Room"}
+        </button>
 
-      {error && <p>{error}</p>}
+        {message && (
+          <p style={{ marginTop: "12px", fontFamily: "var(--font-mono)" }}>
+            {message}
+          </p>
+        )}
+
+        {error && (
+          <p style={{ color: "var(--color-error)", marginTop: "12px", fontFamily: "var(--font-mono)" }}>
+            {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

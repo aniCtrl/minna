@@ -58,53 +58,104 @@ function Lobby() {
   }
 
   if (loading) {
-    return <p>Loading room...</p>;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Minna.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Loading room...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Error.exe</span>
+        </div>
+        <div className="window-content">
+          <p style={{ color: "var(--color-error)" }}>{error}</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!room) {
-    return <p>Room not found.</p>;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Not Found.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Room not found.</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Movie Night Lobby</h1>
-
-      <RoomCodeDisplay roomCode={roomCode} />
-
-      {room.status === "lobby" && (
-        <p>
-          Waiting for everyone to join and get ready.
-        </p>
-      )}
-
-      <h3>Members</h3>
-
-      <ul>
-        {members.map((member) => (
-          <li key={member.uid}>
-            {member.displayName}
-          </li>
-        ))}
-      </ul>
-
-      {room.status === "lobby" && (
-        <button onClick={() => navigate(`/movie-selection/${roomCode}`)}>
-          Go to Movie Selection
+    <div className="window-box">
+      <div className="window-title-bar">
+        <span>Minna.exe - Room Lobby</span>
+        <button 
+          onClick={() => navigate("/")}
+          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+        >
+          X
         </button>
-      )}
+      </div>
+      <div className="window-content">
+        <h1 style={{ marginBottom: "12px" }}>Movie Night Lobby</h1>
 
-      {/* Room management */}
-      <button onClick={handleCloseRoom}>
-        Close Room
-      </button>
+        <RoomCodeDisplay roomCode={roomCode} />
 
-      <button onClick={handleClaimHost}>
-        Claim Host
-      </button>
+        {room.status === "lobby" && (
+          <p style={{ margin: "12px 0", fontStyle: "italic", fontSize: "0.95em" }}>
+            Waiting for everyone to join and get ready.
+          </p>
+        )}
+
+        <hr className="retro-divider" />
+
+        <h3 style={{ fontFamily: "var(--font-mono)", fontSize: "14px", textTransform: "uppercase", marginBottom: "8px" }}>
+          Active Members ({members.length})
+        </h3>
+
+        <ul style={{ listStyleType: "none", padding: 0, margin: "0 0 24px 0", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {members.map((member) => (
+            <li key={member.uid} className="retro-chip" style={{ padding: "6px 12px" }}>
+              👤 {member.displayName}
+            </li>
+          ))}
+        </ul>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {room.status === "lobby" && (
+            <button className="btn-primary" onClick={() => navigate(`/movie-selection/${roomCode}`)} style={{ width: "100%" }}>
+              Go to Movie Selection
+            </button>
+          )}
+
+          <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+            <button onClick={handleCloseRoom} style={{ flex: 1 }}>
+              Close Room
+            </button>
+
+            <button onClick={handleClaimHost} style={{ flex: 1 }}>
+              Claim Host
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

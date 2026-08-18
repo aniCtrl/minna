@@ -39,64 +39,94 @@ function CreateRoom() {
   }
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="window-box">
+        <div className="window-title-bar">
+          <span>Minna.exe</span>
+        </div>
+        <div className="window-content">
+          <p>Loading session...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Create Room</h1>
-
-      <div>
-        <h2>Your Name</h2>
-
-        <input
-          type="text"
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-          placeholder="Enter your name"
-          maxLength={30}
-        />
+    <div className="window-box">
+      <div className="window-title-bar">
+        <span>Minna.exe - Create Room</span>
+        <button 
+          onClick={() => navigate("/")}
+          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+        >
+          X
+        </button>
       </div>
-      <div>
-        <h2>Match Mode</h2>
+      <div className="window-content">
+        <h1 style={{ marginBottom: "16px" }}>Create Room</h1>
 
-        <p>
-          Choose how movies become matches after everyone votes.
-        </p>
-
-        <label>
+        <div className="form-group">
+          <label htmlFor="displayName">Your Name</label>
           <input
-            type="radio"
-            value="strict"
-            checked={matchMode === "strict"}
-            onChange={(event) => setMatchMode(event.target.value)}
+            id="displayName"
+            type="text"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            placeholder="Enter your name"
+            maxLength={30}
           />
-          Everyone has to like it
-        </label>
-        <p style={{ fontSize: "0.85em", color: "#666", marginTop: "4px", marginBottom: "12px", paddingLeft: "24px" }}>
-          Only movies liked by everyone become matches.
-        </p>
+        </div>
 
-        <label>
-          <input
-            type="radio"
-            value="majority"
-            checked={matchMode === "majority"}
-            onChange={(event) => setMatchMode(event.target.value)}
-          />
-          Most people have to like it
-        </label>
-        <p style={{ fontSize: "0.85em", color: "#666", marginTop: "4px", marginBottom: "12px", paddingLeft: "24px" }}>
-          Movies liked by more than half the group become matches.
-        </p>
+        <div className="form-group" style={{ marginTop: "16px" }}>
+          <label>Match Mode</label>
+          <p style={{ marginBottom: "12px", fontSize: "0.9em" }}>
+            Choose how movies become matches after everyone votes.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "bold" }}>
+              <input
+                type="radio"
+                value="strict"
+                checked={matchMode === "strict"}
+                onChange={(event) => setMatchMode(event.target.value)}
+              />
+              Everyone has to like it
+            </label>
+            <p style={{ fontSize: "0.85em", color: "var(--color-on-surface-variant)", paddingLeft: "20px" }}>
+              Only movies liked by everyone become matches.
+            </p>
+
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "bold", marginTop: "8px" }}>
+              <input
+                type="radio"
+                value="majority"
+                checked={matchMode === "majority"}
+                onChange={(event) => setMatchMode(event.target.value)}
+              />
+              Most people have to like it
+            </label>
+            <p style={{ fontSize: "0.85em", color: "var(--color-on-surface-variant)", paddingLeft: "20px" }}>
+              Movies liked by more than half the group become matches.
+            </p>
+          </div>
+        </div>
+
+        <button 
+          className="btn-primary" 
+          onClick={handleCreateRoom} 
+          disabled={creating}
+          style={{ width: "100%", marginTop: "24px" }}
+        >
+          {creating ? "Creating..." : "Create Room"}
+        </button>
+
+        {error && (
+          <p style={{ color: "var(--color-error)", marginTop: "12px", fontFamily: "var(--font-mono)" }}>
+            {error}
+          </p>
+        )}
       </div>
-
-      <button onClick={handleCreateRoom} disabled={creating}>
-        {creating ? "Creating..." : "Create Room"}
-      </button>
-
-
-      {error && <p>{error}</p>}
     </div>
   );
 }

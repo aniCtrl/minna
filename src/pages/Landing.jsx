@@ -4,21 +4,26 @@ function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <h1>Minna</h1>
+    <div className="window-box">
+      <div className="window-title-bar">
+        <span>Minna.exe</span>
+      </div>
+      <div className="window-content center-container">
+        <h1 style={{ marginBottom: "8px" }}>MINNA</h1>
+        <p style={{ marginBottom: "24px" }}>
+          Pick movies together. Vote on your favorites. Find your
+          group's perfect match.
+        </p>
 
-      <p>
-        Pick movies together. Vote on your favorites. Find your
-        group's perfect match.
-      </p>
-
-      <button onClick={() => navigate("/create")}>
-        Create a Room
-      </button>
-
-      <button onClick={() => navigate("/join")}>
-        Join a Room
-      </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+          <button className="btn-primary" onClick={() => navigate("/create")} style={{ width: "100%" }}>
+            Create a Room
+          </button>
+          <button onClick={() => navigate("/join")} style={{ width: "100%" }}>
+            Join a Room
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
