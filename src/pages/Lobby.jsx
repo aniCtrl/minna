@@ -2,7 +2,7 @@ import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Users, User, LogOut, ShieldAlert, X } from "lucide-react";
+import { Users, User, LogOut, ShieldAlert, X, Loader } from "lucide-react";
 
 import RoomCodeDisplay from "../components/RoomCodeDisplay";
 
