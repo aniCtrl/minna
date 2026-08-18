@@ -1,18 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import { Film } from "lucide-react";
 
 function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="window-box">
+    <main className="window-box">
       <div className="window-title-bar">
-        <span>Minna.exe</span>
+        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <Film size={14} /> Minna.exe
+        </span>
       </div>
       <div className="window-content center-container">
         <h1 style={{ marginBottom: "8px" }}>MINNA</h1>
-        <p style={{ marginBottom: "24px" }}>
-          Pick movies together. Vote on your favorites. Find your
-          group's perfect match.
+        <p style={{ marginBottom: "24px", fontFamily: "var(--font-mono)", fontWeight: "bold", fontSize: "16px", color: "var(--color-primary)" }}>
+          Pick together. Watch together.
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
@@ -24,7 +26,7 @@ function Landing() {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

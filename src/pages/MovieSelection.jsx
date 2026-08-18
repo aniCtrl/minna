@@ -5,6 +5,7 @@ import { addMovieToPool, startVoting } from "../services/rooms";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { Film, Search, Plus, Check, Loader, X, Play } from "lucide-react";
 
 function MovieSelection() {
   const { roomCode } = useParams();
@@ -149,14 +150,17 @@ function MovieSelection() {
   const isHost = uid && room?.hostUid === uid;
 
   return (
-    <div className="window-box">
+    <main className="window-box">
       <div className="window-title-bar">
-        <span>Minna.exe - Movie Selection</span>
+        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <Film size={14} /> Minna.exe - Movie Selection
+        </span>
         <button 
           onClick={() => navigate(`/lobby/${roomCode}`)}
-          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+          style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
+          aria-label="Back to room lobby"
         >
-          X
+          <X size={12} />
         </button>
       </div>
       <div className="window-content">
@@ -178,8 +182,8 @@ function MovieSelection() {
               }}
               placeholder="Search for a movie..."
             />
-            <button className="btn-primary" onClick={handleSearch} disabled={searching}>
-              {searching ? "Searching..." : "Search"}
+            <button className="btn-primary" onClick={handleSearch} disabled={searching} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Search size={14} /> Search
             </button>
           </div>
         </div>
@@ -187,7 +191,7 @@ function MovieSelection() {
         {error && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{error}</p>}
         {moviesError && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{moviesError}</p>}
 
-        <div className="movie-grid">
+        <div className="movie-grid" aria-label="Search Results">
           {hasSearched && searchResults.length === 0 && !searching && (
             <p style={{ gridColumn: "1/-1" }}>No movies found. Try a different search.</p>
           )}
@@ -225,15 +229,23 @@ function MovieSelection() {
                     movies.length >= 10 ||
                     addingMovieId === movie.id
                   }
-                  style={{ width: "100%", marginTop: "auto" }}
+                  style={{ width: "100%", marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
                 >
-                  {alreadyAdded
-                    ? "Added"
-                    : addingMovieId === movie.id
-                      ? "Adding..."
-                      : movies.length >= 10
-                        ? "Pool Full"
-                        : "Add"}
+                  {alreadyAdded ? (
+                    <>
+                      <Check size={14} /> Added
+                    </>
+                  ) : addingMovieId === movie.id ? (
+                    <>
+                      <Loader size={14} className="spinner" /> Adding...
+                    </>
+                  ) : movies.length >= 10 ? (
+                    "Pool Full"
+                  ) : (
+                    <>
+                      <Plus size={14} /> Add
+                    </>
+                  )}
                 </button>
               </div>
             );
@@ -255,7 +267,7 @@ function MovieSelection() {
         <hr className="retro-divider" />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
-          <h2>Movie Pool</h2>
+          <h2 id="movie-pool-heading">Movie Pool</h2>
           <span className="retro-chip tertiary">{movies.length} / 10 movies</span>
         </div>
 
@@ -265,7 +277,7 @@ function MovieSelection() {
           <p style={{ fontStyle: "italic" }}>No movies added yet.</p>
         )}
 
-        <div className="movie-grid" style={{ marginBottom: "24px" }}>
+        <div className="movie-grid" aria-labelledby="movie-pool-heading" aria-live="polite" style={{ marginBottom: "24px" }}>
           {movies.map((movie) => (
             <div key={movie.id} className="movie-card">
               {movie.posterPath ? (
@@ -308,9 +320,9 @@ function MovieSelection() {
               className="btn-primary"
               onClick={handleStartVoting}
               disabled={!canStartVoting}
-              style={{ width: "100%" }}
+              style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
             >
-              Start Voting
+              <Play size={14} /> Start Voting
             </button>
 
             {!canStartVoting && (
@@ -327,7 +339,7 @@ function MovieSelection() {
           </p>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 

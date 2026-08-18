@@ -2,6 +2,7 @@ import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Users, User, LogOut, ShieldAlert, X } from "lucide-react";
 
 import RoomCodeDisplay from "../components/RoomCodeDisplay";
 
@@ -61,10 +62,14 @@ function Lobby() {
     return (
       <div className="window-box">
         <div className="window-title-bar">
-          <span>Minna.exe</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Users size={14} /> Minna.exe
+          </span>
         </div>
         <div className="window-content">
-          <p>Loading room...</p>
+          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <Loader size={16} className="spinner" /> Loading room...
+          </p>
         </div>
       </div>
     );
@@ -103,14 +108,17 @@ function Lobby() {
   }
 
   return (
-    <div className="window-box">
+    <main className="window-box">
       <div className="window-title-bar">
-        <span>Minna.exe - Room Lobby</span>
+        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <Users size={14} /> Minna.exe - Room Lobby
+        </span>
         <button 
           onClick={() => navigate("/")}
-          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+          style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
+          aria-label="Exit room and back to home page"
         >
-          X
+          <X size={12} />
         </button>
       </div>
       <div className="window-content">
@@ -126,14 +134,18 @@ function Lobby() {
 
         <hr className="retro-divider" />
 
-        <h3 style={{ fontFamily: "var(--font-mono)", fontSize: "14px", textTransform: "uppercase", marginBottom: "8px" }}>
+        <h3 id="active-members-heading" style={{ fontFamily: "var(--font-mono)", fontSize: "14px", textTransform: "uppercase", marginBottom: "8px" }}>
           Active Members ({members.length})
         </h3>
 
-        <ul style={{ listStyleType: "none", padding: 0, margin: "0 0 24px 0", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        <ul 
+          aria-labelledby="active-members-heading"
+          aria-live="polite"
+          style={{ listStyleType: "none", padding: 0, margin: "0 0 24px 0", display: "flex", flexWrap: "wrap", gap: "8px" }}
+        >
           {members.map((member) => (
-            <li key={member.uid} className="retro-chip" style={{ padding: "6px 12px" }}>
-              👤 {member.displayName}
+            <li key={member.uid} className="retro-chip" style={{ padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <User size={12} /> {member.displayName}
             </li>
           ))}
         </ul>
@@ -146,17 +158,17 @@ function Lobby() {
           )}
 
           <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-            <button onClick={handleCloseRoom} style={{ flex: 1 }}>
-              Close Room
+            <button onClick={handleCloseRoom} style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}>
+              <LogOut size={13} /> Close Room
             </button>
 
-            <button onClick={handleClaimHost} style={{ flex: 1 }}>
-              Claim Host
+            <button onClick={handleClaimHost} style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}>
+              <ShieldAlert size={13} /> Claim Host
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

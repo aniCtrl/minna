@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { createRoom } from "../services/rooms";
-
 import { useNavigate } from "react-router-dom";
+import { Film, X, Loader } from "lucide-react";
 
 function CreateRoom() {
   const { user, loading } = useAuth();
@@ -42,24 +42,31 @@ function CreateRoom() {
     return (
       <div className="window-box">
         <div className="window-title-bar">
-          <span>Minna.exe</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Minna.exe
+          </span>
         </div>
         <div className="window-content">
-          <p>Loading session...</p>
+          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <Loader size={16} className="spinner" /> Loading session...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="window-box">
+    <main className="window-box">
       <div className="window-title-bar">
-        <span>Minna.exe - Create Room</span>
+        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <Film size={14} /> Minna.exe - Create Room
+        </span>
         <button 
           onClick={() => navigate("/")}
-          style={{ border: "none", background: "transparent", padding: "0 4px", fontSize: "12px", cursor: "pointer", color: "inherit" }}
+          style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
+          aria-label="Cancel and back to home page"
         >
-          X
+          <X size={12} />
         </button>
       </div>
       <div className="window-content">
@@ -127,7 +134,7 @@ function CreateRoom() {
           </p>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 

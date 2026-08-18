@@ -244,3 +244,13 @@ button:focus-visible, input:focus-visible {
   background-repeat: repeat-x;
   margin: var(--internal-padding) 0;
 }
+
+/* Spinner rotation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
