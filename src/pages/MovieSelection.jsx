@@ -48,7 +48,9 @@ function MovieSelection() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (room?.status === "voting") {
+    if (room?.status === "closed") {
+      navigate("/", { replace: true });
+    } else if (room?.status === "voting") {
       navigate(`/voting/${roomCode}`);
     }
   }, [room?.status, roomCode, navigate]);

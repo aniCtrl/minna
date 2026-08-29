@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useRoom } from "../hooks/useRoom";
@@ -19,6 +20,12 @@ function Results() {
     loading: roomLoading,
     error: roomError,
   } = useRoom(roomCode);
+
+  useEffect(() => {
+    if (room?.status === "closed") {
+      navigate("/", { replace: true });
+    }
+  }, [room?.status, roomCode, navigate]);
 
   const members = useMembers(room);
 

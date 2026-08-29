@@ -97,7 +97,9 @@ function Voting() {
   });
 
   useEffect(() => {
-    if (room?.status === "results") {
+    if (room?.status === "closed") {
+      navigate("/", { replace: true });
+    } else if (room?.status === "results") {
       navigate(`/results/${roomCode}`);
     }
   }, [room?.status, roomCode, navigate]);

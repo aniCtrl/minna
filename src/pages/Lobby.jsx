@@ -22,7 +22,9 @@ function Lobby() {
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    if (room?.status === "voting") {
+    if (room?.status === "closed") {
+      navigate("/", { replace: true });
+    } else if (room?.status === "voting") {
       navigate(`/voting/${roomCode}`);
     }
   }, [room?.status, roomCode, navigate]);
@@ -32,6 +34,7 @@ function Lobby() {
     try {
       setProcessing(true);
       await closeRoom(roomCode, user.uid);
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Close room error:", error);
 
