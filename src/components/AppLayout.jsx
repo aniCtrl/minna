@@ -30,7 +30,7 @@ function AppLayout({ children }) {
             <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
               <Film size={14} className="top-brand-icon" /> MINNA.EXE
             </span>
-            <span style={{ fontSize: "9px", color: "var(--color-primary-container)", letterSpacing: "0.14em", fontWeight: "600", marginTop: "-4px", textAlign: "center" }}>みんな</span>
+            <span style={{ fontSize: "9px", color: "var(--color-primary-container)", letterSpacing: "0.14em", fontWeight: "600", marginTop: "-4px", textAlign: "center", transform: "translateX(8px)" }}>みんな</span>
           </span>
           <span className="top-divider">|</span>
           <span className="top-subtitle">Movie Night Matcher</span>
