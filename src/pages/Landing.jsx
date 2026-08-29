@@ -18,10 +18,6 @@ function Landing() {
       </div>
 
       <div className="window-content center-container" style={{ padding: "28px 24px" }}>
-        {/* Retro Header Badge */}
-        <div className="retro-chip tertiary" style={{ marginBottom: "12px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-          <Sparkles size={13} /> RETRO MOVIE NIGHT MATCHER
-        </div>
 
         <h1 style={{ fontSize: "32px", marginBottom: "6px", letterSpacing: "-0.04em" }}>
           MINNA
