@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useAllVotes } from "../hooks/useAllVotes";
+import { useAuth } from "../hooks/useAuth";
 import { computeMatches } from "../services/votes";
-import { Film, Award, Frown, X, ArrowLeft, Loader } from "lucide-react";
+import { resetRoomForNewRound } from "../services/rooms";
+import { Film, Award, Frown, X, ArrowLeft, Loader, RotateCcw } from "lucide-react";
 
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
@@ -14,6 +16,9 @@ import ErrorState from "../components/ErrorState";
 function Results() {
   const { roomCode } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [resetting, setResetting] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   const {
     room,
@@ -24,6 +29,10 @@ function Results() {
   useEffect(() => {
     if (room?.status === "closed") {
       navigate("/", { replace: true });
+    } else if (room?.status === "movie_selection") {
+      navigate(`/movie-selection/${roomCode}`);
+    } else if (room?.status === "lobby") {
+      navigate(`/lobby/${roomCode}`);
     }
   }, [room?.status, roomCode, navigate]);
 
@@ -93,6 +102,22 @@ function Results() {
     ? "Most People Liked"
     : "Everyone Liked";
 
+  const handlePlayAgain = async () => {
+    if (resetting || !user) return;
+
+    setResetting(true);
+    setActionError("");
+
+    try {
+      await resetRoomForNewRound(roomCode, user.uid);
+      navigate(`/movie-selection/${roomCode}`);
+    } catch (err) {
+      console.error("Failed to reset room for new round:", err);
+      setActionError("Failed to start new round. Please try again.");
+      setResetting(false);
+    }
+  };
+
   return (
     <main className="window-box">
       <div className="window-title-bar">
@@ -151,12 +176,30 @@ function Results() {
 
         <hr className="retro-divider" />
 
-        <button 
-          onClick={() => navigate(`/lobby/${roomCode}`)}
-          style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "center" }}
-        >
-          <ArrowLeft size={14} /> Back to Lobby
-        </button>
+        {actionError && (
+          <p style={{ color: "var(--color-error)", fontSize: "12px", textAlign: "center", marginBottom: "8px" }}>
+            {actionError}
+          </p>
+        )}
+
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "4px", flexWrap: "wrap" }}>
+          <button 
+            className="btn-primary"
+            onClick={handlePlayAgain}
+            disabled={resetting}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px" }}
+          >
+            {resetting ? <Loader size={14} className="spinner" /> : <RotateCcw size={14} />} Select Movies Again
+          </button>
+
+          <button 
+            onClick={() => navigate(`/lobby/${roomCode}`)}
+            disabled={resetting}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px" }}
+          >
+            <ArrowLeft size={14} /> Back to Lobby
+          </button>
+        </div>
       </div>
     </main>
   );

@@ -5,6 +5,9 @@ import {
   updateDoc,
   runTransaction,
   writeBatch,
+  collection,
+  getDocs,
+  serverTimestamp,
   Timestamp,
 } from "firebase/firestore";
 
@@ -289,4 +292,46 @@ export async function claimHost(roomCode, uid) {
       hostUid: uid,
     });
   });
+}
+
+/**
+ * Reset a room for a new movie selection round.
+ * Clears old movies and votes while keeping members, host, and room code intact.
+ */
+export async function resetRoomForNewRound(roomCode, uid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+  const roomRef = doc(db, "rooms", normalizedCode);
+
+  const roomSnap = await getDoc(roomRef);
+  if (!roomSnap.exists()) {
+    throw new Error("ROOM_NOT_FOUND");
+  }
+
+  const roomData = roomSnap.data();
+  if (roomData.status === "closed") {
+    throw new Error("ROOM_CLOSED");
+  }
+
+  const moviesRef = collection(db, "rooms", normalizedCode, "movies");
+  const moviesSnap = await getDocs(moviesRef);
+
+  const votesRef = collection(db, "rooms", normalizedCode, "votes");
+  const votesSnap = await getDocs(votesRef);
+
+  const batch = writeBatch(db);
+
+  moviesSnap.forEach((docSnap) => {
+    batch.delete(docSnap.ref);
+  });
+
+  votesSnap.forEach((docSnap) => {
+    batch.delete(docSnap.ref);
+  });
+
+  batch.update(roomRef, {
+    status: "movie_selection",
+    updatedAt: serverTimestamp(),
+  });
+
+  await batch.commit();
 }
