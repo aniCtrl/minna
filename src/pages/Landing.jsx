@@ -19,9 +19,26 @@ function Landing() {
 
       <div className="window-content center-container" style={{ padding: "28px 24px" }}>
 
-        <h1 style={{ fontSize: "32px", marginBottom: "6px", letterSpacing: "-0.04em" }}>
-          MINNA
-        </h1>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "6px" }}>
+          <span 
+            style={{ 
+              fontSize: "16px", 
+              fontWeight: "600",
+              fontFamily: "var(--font-mono)", 
+              color: "var(--color-primary)", 
+              letterSpacing: "0.15em", 
+              marginBottom: "3px",
+              opacity: 0.95,
+              lineHeight: 1
+            }}
+          >
+            みんな
+          </span>
+
+          <h1 style={{ fontSize: "32px", margin: 0, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
+            MINNA
+          </h1>
+        </div>
 
         <p style={{ 
           marginBottom: "20px", 

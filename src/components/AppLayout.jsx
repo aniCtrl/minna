@@ -15,7 +15,7 @@ function AppLayout({ children }) {
   return (
     <div className={`retro-desktop-wrapper ${isLanding ? "mode-landing" : "mode-app"}`}>
       {/* Background Image Canvas with Atmospheric Overlays */}
-      <div 
+      <div
         className="retro-bg-canvas"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
@@ -26,8 +26,11 @@ function AppLayout({ children }) {
       {/* Retro OS Top System Navigation Bar */}
       <header className="retro-top-bar">
         <div className="retro-top-left">
-          <span className="top-brand">
-            <Film size={14} className="top-brand-icon" /> MINNA.EXE
+          <span className="top-brand" style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", justifyContent: "center", lineHeight: "1" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Film size={14} className="top-brand-icon" /> MINNA.EXE
+            </span>
+            <span style={{ fontSize: "9px", color: "var(--color-primary-container)", letterSpacing: "0.14em", fontWeight: "600", marginTop: "-4px", textAlign: "center" }}>みんな</span>
           </span>
           <span className="top-divider">|</span>
           <span className="top-subtitle">Movie Night Matcher</span>
