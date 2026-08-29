@@ -119,8 +119,9 @@ function Results() {
                       alt={movie.title}
                     />
                   ) : (
-                    <div className="retro-inset movie-poster" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
-                      No Image
+                    <div className="movie-poster-placeholder">
+                      <Film size={26} className="placeholder-icon" />
+                      <span className="placeholder-text">No Poster Image</span>
                     </div>
                   )}
                   

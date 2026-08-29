@@ -308,8 +308,9 @@ function Voting() {
                 draggable="false"
               />
             ) : (
-              <div className="retro-inset" style={{ width: "100%", aspectRatio: "2/3", display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
-                No Image
+              <div className="movie-poster-placeholder">
+                <Film size={32} className="placeholder-icon" />
+                <span className="placeholder-text">No Poster Image</span>
               </div>
             )}
 

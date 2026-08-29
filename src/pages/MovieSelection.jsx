@@ -7,6 +7,28 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Film, Search, Plus, Check, Loader, X, Play } from "lucide-react";
 
+function MoviePoster({ path, alt }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!path || imgError) {
+    return (
+      <div className="movie-poster-placeholder">
+        <Film size={26} className="placeholder-icon" />
+        <span className="placeholder-text">No Poster Image</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      className="movie-poster"
+      src={`https://image.tmdb.org/t/p/w200${path}`}
+      alt={alt}
+      onError={() => setImgError(true)}
+    />
+  );
+}
+
 function MovieSelection() {
   const { roomCode } = useParams();
   const { room, loading: roomLoading, error: roomError } = useRoom(roomCode);
@@ -278,17 +300,7 @@ function MovieSelection() {
 
             return (
               <div key={movie.id} className="movie-card">
-                {movie.poster_path ? (
-                  <img
-                    className="movie-poster"
-                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                    alt={movie.title}
-                  />
-                ) : (
-                  <div className="retro-inset movie-poster" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
-                    No Poster Image
-                  </div>
-                )}
+                <MoviePoster path={movie.poster_path} alt={movie.title} />
 
                 <h3 style={{ fontSize: "13px", height: "36px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", marginTop: "4px" }}>
                   {movie.title}
@@ -356,17 +368,7 @@ function MovieSelection() {
         <div className="movie-grid" aria-labelledby="movie-pool-heading" aria-live="polite" style={{ marginBottom: "24px" }}>
           {movies.map((movie) => (
             <div key={movie.id} className="movie-card">
-              {movie.posterPath ? (
-                <img
-                  className="movie-poster"
-                  src={`https://image.tmdb.org/t/p/w200${movie.posterPath}`}
-                  alt={movie.title}
-                />
-              ) : (
-                <div className="retro-inset movie-poster" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", textAlign: "center", fontSize: "11px", backgroundColor: "#fff" }}>
-                  No Poster Image
-                </div>
-              )}
+              <MoviePoster path={movie.posterPath} alt={movie.title} />
               
               <h3 style={{ fontSize: "13px", marginTop: "4px" }}>{movie.title}</h3>
 
