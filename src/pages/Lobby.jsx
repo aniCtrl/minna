@@ -2,7 +2,7 @@ import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Users, User, LogOut, ShieldAlert, X, Loader } from "lucide-react";
+import { Users, User, LogOut, ShieldAlert, X, Loader, Play, Crown, Radio, Sparkles } from "lucide-react";
 
 import RoomCodeDisplay from "../components/RoomCodeDisplay";
 
@@ -73,12 +73,12 @@ function Lobby() {
       <div className="window-box">
         <div className="window-title-bar">
           <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <Users size={14} /> Minna.exe
+            <Users size={14} /> Minna.exe - Room Lobby
           </span>
         </div>
-        <div className="window-content">
-          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-            <Loader size={16} className="spinner" /> Loading room...
+        <div className="window-content center-container" style={{ padding: "32px 20px" }}>
+          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-mono)", fontWeight: "600" }}>
+            <Loader size={18} className="spinner" /> Accessing room lobby...
           </p>
         </div>
       </div>
@@ -92,8 +92,8 @@ function Lobby() {
           <span>Error.exe</span>
         </div>
         <div className="window-content">
-          <p style={{ color: "var(--color-error)" }}>{error}</p>
-          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+          <p style={{ color: "var(--color-error)", fontFamily: "var(--font-mono)" }}>{error}</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "16px" }}>
             Back to Home
           </button>
         </div>
@@ -108,8 +108,8 @@ function Lobby() {
           <span>Not Found.exe</span>
         </div>
         <div className="window-content">
-          <p>Room not found.</p>
-          <button onClick={() => navigate("/")} style={{ marginTop: "12px" }}>
+          <p style={{ fontFamily: "var(--font-mono)" }}>Room not found.</p>
+          <button onClick={() => navigate("/")} style={{ marginTop: "16px" }}>
             Back to Home
           </button>
         </div>
@@ -117,11 +117,13 @@ function Lobby() {
     );
   }
 
+  const isCurrentUserHost = room.hostUid === user?.uid;
+
   return (
     <>
-      <main className="window-box">
+      <main className="window-box" style={{ width: "100%" }}>
         <div className="window-title-bar">
-          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Users size={14} /> Minna.exe - Room Lobby
           </span>
           <button 
@@ -130,52 +132,108 @@ function Lobby() {
             aria-label="Exit room and back to home page"
             disabled={processing}
           >
-            <X size={12} />
+            <X size={13} />
           </button>
         </div>
-        <div className="window-content">
-          <h1 style={{ marginBottom: "12px" }}>Movie Night Lobby</h1>
 
+        <div className="window-content">
+          {/* Top Status Banner Bar */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
+            <div>
+              <h1 style={{ fontSize: "22px", marginBottom: "2px" }}>Movie Night Lobby</h1>
+              <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
+                Match Mode: <span className="retro-chip secondary" style={{ textTransform: "capitalize", marginLeft: "4px" }}>{room.matchMode || "Strict"}</span>
+              </p>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span className="retro-chip tertiary" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <Radio size={10} className="pulse-icon" /> LOBBY ACTIVE
+              </span>
+            </div>
+          </div>
+
+          {/* Focal Room Code Component */}
           <RoomCodeDisplay roomCode={roomCode} />
 
           {room.status === "lobby" && (
-            <p style={{ margin: "12px 0", fontStyle: "italic", fontSize: "0.95em" }}>
-              Waiting for everyone to join and get ready.
-            </p>
+            <div className="retro-inset" style={{ padding: "10px 14px", margin: "12px 0 16px 0", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Sparkles size={14} style={{ color: "var(--color-tertiary)", flexShrink: 0 }} />
+              <span>Waiting for everyone to join before selecting movies.</span>
+            </div>
           )}
 
           <hr className="retro-divider" />
 
-          <h3 id="active-members-heading" style={{ fontFamily: "var(--font-mono)", fontSize: "14px", textTransform: "uppercase", marginBottom: "8px" }}>
-            Active Members ({members.length})
-          </h3>
+          {/* Active Members Section */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <h3 id="active-members-heading" style={{ fontFamily: "var(--font-mono)", fontSize: "13px", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "6px" }}>
+              <Users size={14} /> Active Members ({members.length})
+            </h3>
+            <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--color-outline)" }}>
+              LIVE PRESENCE
+            </span>
+          </div>
 
           <ul 
             aria-labelledby="active-members-heading"
             aria-live="polite"
-            style={{ listStyleType: "none", padding: 0, margin: "0 0 24px 0", display: "flex", flexWrap: "wrap", gap: "8px" }}
+            className="member-list-grid"
           >
-            {members.map((member) => (
-              <li key={member.uid} className="retro-chip" style={{ padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                <User size={12} /> {member.displayName}
-              </li>
-            ))}
+            {members.map((member) => {
+              const isHost = member.uid === room.hostUid;
+              const isSelf = member.uid === user?.uid;
+              const initial = member.displayName ? member.displayName.charAt(0).toUpperCase() : "?";
+
+              return (
+                <li key={member.uid} className="member-item-card">
+                  <div className="member-avatar">
+                    {initial}
+                  </div>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {member.displayName} {isSelf && "(You)"}
+                  </span>
+                  {isHost && (
+                    <span className="member-host-badge" title="Room Host">
+                      <Crown size={10} style={{ display: "inline-block", verticalAlign: "middle", marginRight: "2px" }} />
+                      HOST
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <hr className="retro-divider" />
+
+          {/* Lobby Navigation Actions */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {room.status === "lobby" && (
-              <button className="btn-primary" onClick={() => navigate(`/movie-selection/${roomCode}`)} disabled={processing} style={{ width: "100%" }}>
-                Go to Movie Selection
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate(`/movie-selection/${roomCode}`)} 
+                disabled={processing} 
+                style={{ width: "100%", padding: "12px", fontSize: "14px", display: "inline-flex", gap: "8px", alignItems: "center", justifyContent: "center" }}
+              >
+                <Play size={16} /> Go to Movie Selection
               </button>
             )}
 
-            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-              <button onClick={handleCloseRoom} disabled={processing} style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+              <button 
+                onClick={handleCloseRoom} 
+                disabled={processing} 
+                style={{ flex: 1, padding: "10px", display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}
+              >
                 <LogOut size={13} /> Close Room
               </button>
 
-              <button onClick={handleClaimHost} disabled={processing} style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}>
-                <ShieldAlert size={13} /> Claim Host
+              <button 
+                onClick={handleClaimHost} 
+                disabled={processing || isCurrentUserHost} 
+                style={{ flex: 1, padding: "10px", display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}
+              >
+                <ShieldAlert size={13} /> {isCurrentUserHost ? "You are Host" : "Claim Host"}
               </button>
             </div>
           </div>
@@ -183,19 +241,19 @@ function Lobby() {
       </main>
 
       {alertMessage && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "16px" }}>
-          <div className="window-box" style={{ maxWidth: "320px", width: "100%", margin: 0 }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "16px" }}>
+          <div className="window-box" style={{ maxWidth: "340px", width: "100%", margin: 0 }}>
             <div className="window-title-bar">
               <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <ShieldAlert size={12} /> Message.exe
+                <ShieldAlert size={13} /> System Message.exe
               </span>
               <button onClick={() => setAlertMessage(null)} style={{ border: "none", background: "transparent", color: "inherit", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                <X size={12} />
+                <X size={13} />
               </button>
             </div>
-            <div className="window-content" style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", textAlign: "center" }}>
+            <div className="window-content" style={{ display: "flex", flexDirection: "column", gap: "14px", alignItems: "center", textAlign: "center" }}>
               <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px" }}>{alertMessage}</p>
-              <button className="btn-primary" onClick={() => setAlertMessage(null)} style={{ minWidth: "80px" }}>
+              <button className="btn-primary" onClick={() => setAlertMessage(null)} style={{ minWidth: "90px" }}>
                 OK
               </button>
             </div>

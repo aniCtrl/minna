@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Copy, Check, Share2, Key } from "lucide-react";
 
 function RoomCodeDisplay({ roomCode }) {
   const [copied, setCopied] = useState(false);
@@ -19,17 +20,34 @@ function RoomCodeDisplay({ roomCode }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "stretch", width: "100%", margin: "8px 0" }}>
-      <label style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600 }}>Room Code</label>
-      <div style={{ display: "flex", gap: "8px" }}>
-        <div 
-          className="retro-inset" 
-          style={{ flex: 1, padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "18px", fontWeight: "bold", textAlign: "center", letterSpacing: "1px" }}
-        >
+    <div className="room-code-container">
+      <div className="room-code-header">
+        <label className="room-code-label">
+          <Key size={13} /> Room Access Code
+        </label>
+        <span className="room-code-subtext" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          <Share2 size={12} /> Share invite link with friends
+        </span>
+      </div>
+
+      <div className="room-code-box">
+        <div className="room-code-display-value">
           {roomCode}
         </div>
-        <button onClick={handleCopyInviteLink} style={{ minWidth: "120px" }}>
-          {copied ? "Copied!" : "Copy Link"}
+        <button 
+          className={copied ? "btn-secondary" : "btn-primary"} 
+          onClick={handleCopyInviteLink} 
+          style={{ minWidth: "130px", height: "48px", display: "inline-flex", gap: "8px", alignItems: "center", justifyContent: "center" }}
+        >
+          {copied ? (
+            <>
+              <Check size={14} /> Copied!
+            </>
+          ) : (
+            <>
+              <Copy size={14} /> Copy Link
+            </>
+          )}
         </button>
       </div>
     </div>

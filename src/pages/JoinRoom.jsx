@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { joinRoom } from "../services/rooms";
-import { Film, X, Loader } from "lucide-react";
+import { Film, X, Loader, LogIn, Key, User } from "lucide-react";
 
 function JoinRoom() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ function JoinRoom() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [displayName, setDisplayName] = useState("");
-
 
   async function handleJoinRoom() {
     if (!user || !roomCode.trim()) {
@@ -51,15 +50,15 @@ function JoinRoom() {
 
   if (loading) {
     return (
-      <div className="window-box">
+      <div className="window-box" style={{ width: "100%" }}>
         <div className="window-title-bar">
           <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <Film size={14} /> Minna.exe
+            <Film size={14} /> Minna.exe - Join Room
           </span>
         </div>
-        <div className="window-content">
-          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-            <Loader size={16} className="spinner" /> Loading session...
+        <div className="window-content center-container" style={{ padding: "32px 20px" }}>
+          <p style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-mono)", fontWeight: "600" }}>
+            <Loader size={18} className="spinner" /> Loading session...
           </p>
         </div>
       </div>
@@ -67,7 +66,7 @@ function JoinRoom() {
   }
 
   return (
-    <main className="window-box">
+    <main className="window-box" style={{ width: "100%" }}>
       <div className="window-title-bar">
         <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <Film size={14} /> Minna.exe - Join Room
@@ -77,33 +76,39 @@ function JoinRoom() {
           style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
           aria-label="Cancel and back to home page"
         >
-          <X size={12} />
+          <X size={13} />
         </button>
       </div>
+
       <div className="window-content">
-        <h1 style={{ marginBottom: "16px" }}>Join Room</h1>
+        <h1 style={{ marginBottom: "16px", fontSize: "22px" }}>Join Movie Room</h1>
 
         <div className="form-group">
-          <label htmlFor="displayName">Your Name</label>
+          <label htmlFor="displayName" style={{ fontFamily: "var(--font-mono)", fontWeight: "600", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+            <User size={13} /> YOUR NAME
+          </label>
           <input
             id="displayName"
             type="text"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
-            placeholder="Enter your name"
+            placeholder="Enter your display name"
             maxLength={30}
           />
         </div>
 
-        <div className="form-group" style={{ marginTop: "16px" }}>
-          <label htmlFor="roomCode">Room Code</label>
+        <div className="form-group" style={{ marginTop: "18px" }}>
+          <label htmlFor="roomCode" style={{ fontFamily: "var(--font-mono)", fontWeight: "600", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+            <Key size={13} /> ROOM CODE
+          </label>
           <input
             id="roomCode"
             type="text"
             value={roomCode}
             onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
-            placeholder="Enter 6-character code"
+            placeholder="Enter 6-character code (e.g. AB12CD)"
             maxLength={6}
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "2px", fontWeight: "bold" }}
           />
         </div>
 
@@ -111,19 +116,27 @@ function JoinRoom() {
           className="btn-primary"
           onClick={handleJoinRoom} 
           disabled={joining || !roomCode.trim()}
-          style={{ width: "100%", marginTop: "24px" }}
+          style={{ width: "100%", marginTop: "24px", padding: "12px", fontSize: "14px", display: "inline-flex", gap: "8px", alignItems: "center", justifyContent: "center" }}
         >
-          {joining ? "Joining..." : "Join Room"}
+          {joining ? (
+            <>
+              <Loader size={16} className="spinner" /> Joining Room...
+            </>
+          ) : (
+            <>
+              <LogIn size={16} /> Join Room
+            </>
+          )}
         </button>
 
         {message && (
-          <p style={{ marginTop: "12px", fontFamily: "var(--font-mono)" }}>
+          <p style={{ marginTop: "12px", fontFamily: "var(--font-mono)", fontSize: "13px" }}>
             {message}
           </p>
         )}
 
         {error && (
-          <p style={{ color: "var(--color-error)", marginTop: "12px", fontFamily: "var(--font-mono)" }}>
+          <p style={{ color: "var(--color-error)", marginTop: "12px", fontFamily: "var(--font-mono)", fontSize: "13px" }}>
             {error}
           </p>
         )}
