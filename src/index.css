@@ -99,8 +99,9 @@ body {
   transition: opacity 0.4s ease;
 }
 
-/* Overlays tuned to preserve palette tone and text legibility */
-.retro-bg-overlay.landing-overlay {
+/* Overlays tuned to preserve palette tone and text legibility identically across landing and app pages */
+.retro-bg-overlay.landing-overlay,
+.retro-bg-overlay.app-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -109,18 +110,6 @@ body {
     rgba(42, 76, 77, 0.65) 45%,
     rgba(26, 28, 28, 0.88) 100%
   );
-}
-
-.retro-bg-overlay.app-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(249, 249, 249, 0.65) 0%,
-    rgba(238, 238, 238, 0.60) 50%,
-    rgba(226, 226, 226, 0.70) 100%
-  );
-  backdrop-filter: blur(0.9px);
 }
 
 /* CRT Scanline & Grain Texture */
