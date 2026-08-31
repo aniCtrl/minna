@@ -250,184 +250,195 @@ function MovieSelection() {
   const isHost = uid && room?.hostUid === uid;
 
   return (
-    <main className="window-box">
-      <div className="window-title-bar">
-        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <Film size={14} /> Minna.exe - Movie Selection
-        </span>
-        <button 
-          onClick={() => navigate(`/lobby/${roomCode}`)}
-          style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
-          aria-label="Back to room lobby"
-        >
-          <X size={12} />
-        </button>
-      </div>
-      <div className="window-content">
-        <h1 style={{ marginBottom: "12px" }}>Movie Selection</h1>
-        <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", marginBottom: "16px" }}>Room Code: {roomCode}</p>
-
-        <div className="form-group">
-          <label htmlFor="searchQuery">Search Movies</label>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <input
-              id="searchQuery"
-              type="text"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-              placeholder="Search for a movie..."
-            />
-            <button className="btn-primary" onClick={handleSearch} disabled={searching} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Search size={14} /> Search
-            </button>
-          </div>
+    <div className="movie-selection-layout">
+      {/* Left Column: Movie Search & Browse */}
+      <main className="window-box movie-search-panel">
+        <div className="window-title-bar">
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Minna.exe - Movie Selection
+          </span>
+          <button 
+            onClick={() => navigate(`/lobby/${roomCode}`)}
+            style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
+            aria-label="Back to room lobby"
+          >
+            <X size={12} />
+          </button>
         </div>
+        <div className="window-content">
+          <h1 style={{ marginBottom: "12px" }}>Movie Selection</h1>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", marginBottom: "16px" }}>Room Code: {roomCode}</p>
 
-        {error && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{error}</p>}
-        {moviesError && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{moviesError}</p>}
-
-        <div className="movie-grid" aria-label="Search Results">
-          {hasSearched && searchResults.length === 0 && !searching && (
-            <p style={{ gridColumn: "1/-1" }}>No movies found. Try a different search.</p>
-          )}
-          {searchResults.map((movie) => {
-            const alreadyAdded = movies.some(
-              (poolMovie) => poolMovie.tmdbId === movie.id
-            );
-
-            return (
-              <div key={movie.id} className="movie-card">
-                <MoviePoster path={movie.poster_path} alt={movie.title} />
-
-                <h3 style={{ fontSize: "13px", height: "36px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", marginTop: "4px" }}>
-                  {movie.title}
-                </h3>
-
-                <p style={{ fontSize: "11px", color: "#666" }}>
-                  {movie.release_date ? movie.release_date.split("-")[0] : "Unknown Year"}
-                </p>
-
-                <button
-                  onClick={() => handleAddMovie(movie)}
-                  disabled={
-                    alreadyAdded ||
-                    movies.length >= 10 ||
-                    addingMovieId === movie.id
+          <div className="form-group">
+            <label htmlFor="searchQuery">Search Movies</label>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                id="searchQuery"
+                type="text"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleSearch();
                   }
-                  style={{ width: "100%", marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
-                >
-                  {alreadyAdded ? (
-                    <>
-                      <Check size={14} /> Added
-                    </>
-                  ) : addingMovieId === movie.id ? (
-                    <>
-                      <Loader size={14} className="spinner" /> Adding...
-                    </>
-                  ) : movies.length >= 10 ? (
-                    "Pool Full"
-                  ) : (
-                    <>
-                      <Plus size={14} /> Add
-                    </>
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                }}
+                placeholder="Search for a movie..."
+              />
+              <button className="btn-primary" onClick={handleSearch} disabled={searching} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <Search size={14} /> Search
+              </button>
+            </div>
+          </div>
 
-        {hasSearched &&
-          searchResults.length > 0 &&
-          searchPage < totalSearchPages && (
-            <button
-              onClick={handleLoadMore}
-              disabled={loadingMore}
-              style={{ width: "100%", marginTop: "16px" }}
-            >
-              {loadingMore ? "Loading..." : "Load More Movies"}
-            </button>
+          {error && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{error}</p>}
+          {moviesError && <p style={{ color: "var(--color-error)", marginTop: "8px", fontFamily: "var(--font-mono)" }}>{moviesError}</p>}
+
+          <div className="movie-grid" aria-label="Search Results">
+            {hasSearched && searchResults.length === 0 && !searching && (
+              <p style={{ gridColumn: "1/-1" }}>No movies found. Try a different search.</p>
+            )}
+            {searchResults.map((movie) => {
+              const alreadyAdded = movies.some(
+                (poolMovie) => poolMovie.tmdbId === movie.id
+              );
+
+              return (
+                <div key={movie.id} className="movie-card">
+                  <MoviePoster path={movie.poster_path} alt={movie.title} />
+
+                  <h3 style={{ fontSize: "13px", height: "36px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", marginTop: "4px" }}>
+                    {movie.title}
+                  </h3>
+
+                  <p style={{ fontSize: "11px", color: "#666" }}>
+                    {movie.release_date ? movie.release_date.split("-")[0] : "Unknown Year"}
+                  </p>
+
+                  <button
+                    onClick={() => handleAddMovie(movie)}
+                    disabled={
+                      alreadyAdded ||
+                      movies.length >= 10 ||
+                      addingMovieId === movie.id
+                    }
+                    style={{ width: "100%", marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
+                  >
+                    {alreadyAdded ? (
+                      <>
+                        <Check size={14} /> Added
+                      </>
+                    ) : addingMovieId === movie.id ? (
+                      <>
+                        <Loader size={14} className="spinner" /> Adding...
+                      </>
+                    ) : movies.length >= 10 ? (
+                      "Pool Full"
+                    ) : (
+                      <>
+                        <Plus size={14} /> Add
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {hasSearched &&
+            searchResults.length > 0 &&
+            searchPage < totalSearchPages && (
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                style={{ width: "100%", marginTop: "16px" }}
+              >
+                {loadingMore ? "Loading..." : "Load More Movies"}
+              </button>
+            )}
+        </div>
+      </main>
+
+      {/* Right Column: Selected Movies Panel */}
+      <aside className="window-box selected-movies-panel">
+        <div className="window-title-bar">
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Film size={14} /> Selected Movies ({movies.length}/10)
+          </span>
+        </div>
+        <div className="window-content">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
+            <h2 id="movie-pool-heading" style={{ fontSize: "16px" }}>Selected Movies</h2>
+            <span className="retro-chip tertiary">{movies.length} / 10 movies</span>
+          </div>
+
+          {moviesLoading && <p>Loading movie pool...</p>}
+
+          {!moviesLoading && movies.length === 0 && (
+            <p style={{ fontStyle: "italic" }}>No movies added yet.</p>
           )}
 
-        <hr className="retro-divider" />
+          <div className="selected-movies-grid" aria-labelledby="movie-pool-heading" aria-live="polite">
+            {movies.map((movie) => (
+              <div key={movie.id} className="movie-card">
+                <MoviePoster path={movie.posterPath} alt={movie.title} />
+                
+                <h3 style={{ fontSize: "13px", marginTop: "4px" }}>{movie.title}</h3>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
-          <h2 id="movie-pool-heading">Movie Pool</h2>
-          <span className="retro-chip tertiary">{movies.length} / 10 movies</span>
-        </div>
+                <div style={{ marginTop: "4px" }}>
+                  {movie.releaseDate && (
+                    <span className="retro-chip" style={{ fontSize: "10px" }}>{movie.releaseDate.split("-")[0]}</span>
+                  )}
+                  {movie.runtime && (
+                    <span className="retro-chip secondary" style={{ fontSize: "10px" }}>{movie.runtime}m</span>
+                  )}
+                </div>
 
-        {moviesLoading && <p>Loading movie pool...</p>}
-
-        {!moviesLoading && movies.length === 0 && (
-          <p style={{ fontStyle: "italic" }}>No movies added yet.</p>
-        )}
-
-        <div className="movie-grid" aria-labelledby="movie-pool-heading" aria-live="polite" style={{ marginBottom: "24px" }}>
-          {movies.map((movie) => (
-            <div key={movie.id} className="movie-card">
-              <MoviePoster path={movie.posterPath} alt={movie.title} />
-              
-              <h3 style={{ fontSize: "13px", marginTop: "4px" }}>{movie.title}</h3>
-
-              <div style={{ marginTop: "4px" }}>
-                {movie.releaseDate && (
-                  <span className="retro-chip" style={{ fontSize: "10px" }}>{movie.releaseDate.split("-")[0]}</span>
-                )}
-                {movie.runtime && (
-                  <span className="retro-chip secondary" style={{ fontSize: "10px" }}>{movie.runtime}m</span>
-                )}
+                {movie.genres?.slice(0, 2).map((genre) => (
+                  <span key={genre} className="retro-chip tertiary" style={{ fontSize: "9px", display: "inline-block", marginTop: "4px" }}>
+                    {genre}
+                  </span>
+                ))}
               </div>
+            ))}
+          </div>
 
-              {movie.genres?.slice(0, 2).map((genre) => (
-                <span key={genre} className="retro-chip tertiary" style={{ fontSize: "9px", display: "inline-block", marginTop: "4px" }}>
-                  {genre}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
+          <hr className="retro-divider" />
 
-        <hr className="retro-divider" />
+          {isHost ? (
+            <>
+              <button
+                className="btn-primary"
+                onClick={handleStartVoting}
+                disabled={!canStartVoting || startingVoting}
+                style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+              >
+                {startingVoting ? (
+                  <>
+                    <Loader size={14} className="spinner" /> Starting...
+                  </>
+                ) : (
+                  <>
+                    <Play size={14} /> Start Voting
+                  </>
+                )}
+              </button>
 
-        {isHost ? (
-          <>
-            <button
-              className="btn-primary"
-              onClick={handleStartVoting}
-              disabled={!canStartVoting || startingVoting}
-              style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
-            >
-              {startingVoting ? (
-                <>
-                  <Loader size={14} className="spinner" /> Starting...
-                </>
-              ) : (
-                <>
-                  <Play size={14} /> Start Voting
-                </>
+              {!canStartVoting && (
+                <p style={{ marginTop: "8px", fontStyle: "italic", textAlign: "center" }}>
+                  Add at least 5 movies to start voting.
+                </p>
               )}
-            </button>
-
-            {!canStartVoting && (
-              <p style={{ marginTop: "8px", fontStyle: "italic", textAlign: "center" }}>
-                Add at least 5 movies to start voting.
-              </p>
-            )}
-          </>
-        ) : (
-          <p style={{ textAlign: "center", fontStyle: "italic" }}>
-            {canStartVoting
-              ? "Waiting for the host to start voting..."
-              : "Add at least 5 movies. The host will start voting."}
-          </p>
-        )}
-      </div>
-    </main>
+            </>
+          ) : (
+            <p style={{ textAlign: "center", fontStyle: "italic" }}>
+              {canStartVoting
+                ? "Waiting for the host to start voting..."
+                : "Add at least 5 movies. The host will start voting."}
+            </p>
+          )}
+        </div>
+      </aside>
+    </div>
   );
 }
 
