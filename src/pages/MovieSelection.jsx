@@ -7,6 +7,53 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Film, Search, Plus, Check, Loader, X, Play } from "lucide-react";
 
+const TMDB_GENRES = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Sci-Fi",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+};
+
+function formatTimestamp(timestamp) {
+  if (!timestamp) return null;
+  let date;
+  if (typeof timestamp.toDate === "function") {
+    date = timestamp.toDate();
+  } else if (timestamp.seconds) {
+    date = new Date(timestamp.seconds * 1000);
+  } else if (typeof timestamp === "string" || typeof timestamp === "number") {
+    date = new Date(timestamp);
+  } else {
+    return null;
+  }
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function getMovieGenres(movie) {
+  if (Array.isArray(movie.genres) && movie.genres.length > 0) {
+    return movie.genres.map((g) => (typeof g === "string" ? g : g.name));
+  }
+  if (Array.isArray(movie.genre_ids) && movie.genre_ids.length > 0) {
+    return movie.genre_ids.map((id) => TMDB_GENRES[id]).filter(Boolean);
+  }
+  return [];
+}
+
 function MoviePoster({ path, alt }) {
   const [imgError, setImgError] = useState(false);
 
@@ -302,6 +349,11 @@ function MovieSelection() {
                 (poolMovie) => poolMovie.tmdbId === movie.id
               );
 
+              const releaseYear = movie.release_date
+                ? movie.release_date.split("-")[0]
+                : null;
+              const movieGenres = getMovieGenres(movie);
+
               return (
                 <div key={movie.id} className="movie-card">
                   <MoviePoster path={movie.poster_path} alt={movie.title} />
@@ -310,9 +362,20 @@ function MovieSelection() {
                     {movie.title}
                   </h3>
 
-                  <p style={{ fontSize: "11px", color: "#666" }}>
-                    {movie.release_date ? movie.release_date.split("-")[0] : "Unknown Year"}
-                  </p>
+                  <div style={{ marginTop: "4px" }}>
+                    {releaseYear && (
+                      <span className="retro-chip" style={{ fontSize: "10px" }}>{releaseYear}</span>
+                    )}
+                    {movie.runtime && (
+                      <span className="retro-chip secondary" style={{ fontSize: "10px" }}>{movie.runtime}m</span>
+                    )}
+                  </div>
+
+                  {movieGenres.slice(0, 2).map((genre) => (
+                    <span key={genre} className="retro-chip tertiary" style={{ fontSize: "9px", display: "inline-block", marginTop: "4px" }}>
+                      {genre}
+                    </span>
+                  ))}
 
                   <button
                     onClick={() => handleAddMovie(movie)}
@@ -390,6 +453,9 @@ function MovieSelection() {
                   )}
                   {movie.runtime && (
                     <span className="retro-chip secondary" style={{ fontSize: "10px" }}>{movie.runtime}m</span>
+                  )}
+                  {movie.addedAt && (
+                    <span className="retro-chip" style={{ fontSize: "9px", opacity: 0.85 }}>{formatTimestamp(movie.addedAt)}</span>
                   )}
                 </div>
 

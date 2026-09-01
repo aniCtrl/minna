@@ -132,6 +132,7 @@ export async function addMovieToPool(roomCode, movie, details) {
       : [],
 
     overview: details?.overview ?? null,
+    addedAt: Timestamp.now(),
   });
 }
 

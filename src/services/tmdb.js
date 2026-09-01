@@ -20,8 +20,23 @@ export async function searchMovies(query, page = 1) {
 
   const data = await response.json();
 
+  const enrichedResults = await Promise.all(
+    data.results.map(async (movie) => {
+      try {
+        const details = await getMovieDetails(movie.id);
+        return {
+          ...movie,
+          runtime: details.runtime ?? null,
+          genres: details.genres ? details.genres.map((g) => g.name) : [],
+        };
+      } catch (err) {
+        return movie;
+      }
+    })
+  );
+
   return {
-    results: data.results,
+    results: enrichedResults,
     page: data.page,
     totalPages: data.total_pages,
   };
