@@ -31,9 +31,13 @@ service cloud.firestore {
             request.resource.data.matchMode == resource.data.matchMode
             &&
             (
-              // lobby -> voting
+              // lobby or movie_selection -> voting
               (
-                resource.data.status == "lobby"
+                (
+                  resource.data.status == "lobby"
+                  ||
+                  resource.data.status == "movie_selection"
+                )
                 &&
                 request.resource.data.status == "voting"
               )
@@ -55,6 +59,8 @@ service cloud.firestore {
                 &&
                 (
                   resource.data.status == "lobby"
+                  ||
+                  resource.data.status == "movie_selection"
                   ||
                   resource.data.status == "voting"
                   ||
@@ -131,9 +137,11 @@ service cloud.firestore {
       allow read: if request.auth != null;
 
       allow create: if request.auth != null
-        && get(
-          /databases/$(database)/documents/rooms/$(roomCode)
-        ).data.status == "lobby"
+        && (
+          get(/databases/$(database)/documents/rooms/$(roomCode)).data.status == "lobby"
+          ||
+          get(/databases/$(database)/documents/rooms/$(roomCode)).data.status == "movie_selection"
+        )
         && get(
           /databases/$(database)/documents/rooms/$(roomCode)
         ).data.members[request.auth.uid] != null;
@@ -142,9 +150,11 @@ service cloud.firestore {
         && get(
           /databases/$(database)/documents/rooms/$(roomCode)
         ).data.hostUid == request.auth.uid
-        && get(
-          /databases/$(database)/documents/rooms/$(roomCode)
-        ).data.status == "lobby";
+        && (
+          get(/databases/$(database)/documents/rooms/$(roomCode)).data.status == "lobby"
+          ||
+          get(/databases/$(database)/documents/rooms/$(roomCode)).data.status == "movie_selection"
+        );
     }
 
 

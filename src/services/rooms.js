@@ -153,7 +153,7 @@ export async function removeMovieFromPool(roomCode, movieId, uid) {
     throw new Error("NOT_HOST");
   }
 
-  if (roomData.status !== "lobby") {
+  if (roomData.status !== "lobby" && roomData.status !== "movie_selection") {
     throw new Error("INVALID_STATUS");
   }
 
@@ -185,7 +185,7 @@ export async function startVoting(roomCode, uid) {
     throw new Error("NOT_HOST");
   }
 
-  if (roomData.status !== "lobby") {
+  if (roomData.status !== "lobby" && roomData.status !== "movie_selection") {
     throw new Error("INVALID_STATUS");
   }
 
