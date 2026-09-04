@@ -137,6 +137,14 @@ service cloud.firestore {
         && get(
           /databases/$(database)/documents/rooms/$(roomCode)
         ).data.members[request.auth.uid] != null;
+
+      allow delete: if request.auth != null
+        && get(
+          /databases/$(database)/documents/rooms/$(roomCode)
+        ).data.hostUid == request.auth.uid
+        && get(
+          /databases/$(database)/documents/rooms/$(roomCode)
+        ).data.status == "lobby";
     }
 
 

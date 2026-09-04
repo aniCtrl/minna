@@ -11,6 +11,7 @@ import {
   doc,
   setDoc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 let testEnv;
@@ -294,5 +295,37 @@ describe("Firestore security rules", () => {
     );
 
     expect(successes).toHaveLength(1);
+  });
+
+  it("allows the room host to delete a movie from the pool", async () => {
+    await createTestRoom();
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, "rooms/ABC123/movies/101"), {
+        title: "Test Movie",
+        tmdbId: 101,
+      });
+    });
+
+    const host = testEnv.authenticatedContext("host1");
+    const db = host.firestore();
+
+    await assertSucceeds(deleteDoc(doc(db, "rooms/ABC123/movies/101")));
+  });
+
+  it("rejects a non-host trying to delete a movie from the pool", async () => {
+    await createTestRoom();
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, "rooms/ABC123/movies/101"), {
+        title: "Test Movie",
+        tmdbId: 101,
+      });
+    });
+
+    const user2 = testEnv.authenticatedContext("user2");
+    const db = user2.firestore();
+
+    await assertFails(deleteDoc(doc(db, "rooms/ABC123/movies/101")));
   });
 });

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRoom } from "../hooks/useRoom";
 import { searchMovies, getMovieDetails } from "../services/tmdb";
-import { addMovieToPool, startVoting } from "../services/rooms";
+import { addMovieToPool, removeMovieFromPool, startVoting } from "../services/rooms";
 import { useMoviePool } from "../hooks/useMoviePool";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { Film, Search, Plus, Check, Loader, X, Play } from "lucide-react";
+import { Film, Search, Plus, Check, Loader, X, Play, Trash2 } from "lucide-react";
 
 const TMDB_GENRES = {
   28: "Action",
@@ -89,6 +89,7 @@ function MovieSelection() {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
   const [addingMovieId, setAddingMovieId] = useState(null);
+  const [deletingMovieId, setDeletingMovieId] = useState(null);
   const [startingVoting, setStartingVoting] = useState(false);
   const { user } = useAuth();
 
@@ -294,6 +295,26 @@ function MovieSelection() {
     }
   }
 
+  async function handleRemoveMovie(movieId) {
+    if (deletingMovieId || !uid) return;
+
+    try {
+      setDeletingMovieId(movieId);
+      setError("");
+
+      await removeMovieFromPool(roomCode, movieId, uid);
+    } catch (err) {
+      console.error("Remove movie error:", err);
+      if (err.message === "NOT_HOST") {
+        setError("Only the host can remove movies.");
+      } else {
+        setError("Failed to remove movie.");
+      }
+    } finally {
+      setDeletingMovieId(null);
+    }
+  }
+
   const canStartVoting = movies.length >= 5;
   const isHost = uid && room?.hostUid === uid;
 
@@ -465,6 +486,36 @@ function MovieSelection() {
                     {genre}
                   </span>
                 ))}
+
+                {isHost && (
+                  <button
+                    onClick={() => handleRemoveMovie(movie.id)}
+                    disabled={deletingMovieId === movie.id}
+                    title="Remove movie from pool"
+                    aria-label={`Remove ${movie.title} from movie pool`}
+                    style={{
+                      marginTop: "8px",
+                      width: "100%",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "4px",
+                      fontSize: "11px",
+                      padding: "4px 8px",
+                      color: "var(--color-error)",
+                    }}
+                  >
+                    {deletingMovieId === movie.id ? (
+                      <>
+                        <Loader size={12} className="spinner" /> Removing...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={12} /> Remove
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             ))}
           </div>

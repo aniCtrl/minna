@@ -3,6 +3,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   runTransaction,
   writeBatch,
   collection,
@@ -134,6 +135,37 @@ export async function addMovieToPool(roomCode, movie, details) {
     overview: details?.overview ?? null,
     addedAt: Timestamp.now(),
   });
+}
+
+export async function removeMovieFromPool(roomCode, movieId, uid) {
+  const normalizedCode = roomCode.trim().toUpperCase();
+
+  const roomRef = doc(db, "rooms", normalizedCode);
+  const roomSnapshot = await getDoc(roomRef);
+
+  if (!roomSnapshot.exists()) {
+    throw new Error("ROOM_NOT_FOUND");
+  }
+
+  const roomData = roomSnapshot.data();
+
+  if (roomData.hostUid !== uid) {
+    throw new Error("NOT_HOST");
+  }
+
+  if (roomData.status !== "lobby") {
+    throw new Error("INVALID_STATUS");
+  }
+
+  const movieRef = doc(
+    db,
+    "rooms",
+    normalizedCode,
+    "movies",
+    String(movieId)
+  );
+
+  await deleteDoc(movieRef);
 }
 
 export async function startVoting(roomCode, uid) {
