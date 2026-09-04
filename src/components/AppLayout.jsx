@@ -57,13 +57,8 @@ function AppLayout({ children }) {
 
       {/* Retro OS Bottom Taskbar */}
       <footer className="retro-bottom-bar">
-        <div className="bottom-status">
-          <Monitor size={12} />
-          <span>STATUS: READY</span>
-        </div>
-        <div className="bottom-hint">
-          <Sparkles size={12} />
-          <span>MINNA RETRO OS v1.0</span>
+        <div className="bottom-hint" style={{ justifyContent: "center" }}>
+          <span>Pick together. Watch together.</span>
         </div>
       </footer>
     </div>
