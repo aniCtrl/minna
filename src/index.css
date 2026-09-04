@@ -410,7 +410,7 @@ input[type="text"], input[type="search"] {
   width: 100%;
   padding: 10px;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px; /* 16px font-size prevents auto-zoom on iOS Safari */
   border: 2px solid;
   border-color: #808080 #ffffff #ffffff #808080;
   background-color: var(--color-surface-lowest);
@@ -519,25 +519,33 @@ button:focus-visible, input:focus-visible {
   padding: 0;
   margin: 12px 0 24px 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
   gap: 10px;
 }
 
 .member-item-card {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 6px 8px;
   background-color: var(--color-surface-lowest);
   border: 2px solid;
   border-color: #ffffff #a9a9a9 #a9a9a9 #ffffff;
   outline: 1px solid var(--color-outline-variant);
   font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
   color: var(--color-on-surface);
   position: relative;
   animation: memberAppear 0.25s ease-out;
+}
+
+.member-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 @keyframes memberAppear {
@@ -552,23 +560,25 @@ button:focus-visible, input:focus-visible {
 }
 
 .member-avatar {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
   background-color: var(--color-primary-container);
   color: var(--color-on-primary-container);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   border: 1px solid var(--color-primary);
 }
 
 .member-host-badge {
   margin-left: auto;
-  font-size: 10px;
-  padding: 1px 4px;
+  flex-shrink: 0;
+  font-size: 9px;
+  padding: 1px 3px;
   background-color: var(--color-tertiary-container);
   color: var(--color-on-tertiary-container);
   border: 1px solid var(--color-tertiary);

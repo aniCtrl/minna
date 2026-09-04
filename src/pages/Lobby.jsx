@@ -193,7 +193,7 @@ function Lobby() {
                   <div className="member-avatar">
                     {initial}
                   </div>
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span className="member-name">
                     {member.displayName} {isSelf && "(You)"}
                   </span>
                   {isHost && (

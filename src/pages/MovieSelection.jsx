@@ -41,7 +41,8 @@ function formatTimestamp(timestamp) {
   } else {
     return null;
   }
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (!date || isNaN(date.getTime())) return null;
+  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
 function getMovieGenres(movie) {

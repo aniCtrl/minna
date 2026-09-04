@@ -110,6 +110,7 @@
 }
 
 /* Movie Selection 2-Column Responsive Layout */
+.retro-container.has-movie-selection,
 .retro-container:has(.movie-selection-layout) {
   max-width: 1100px;
 }
@@ -126,6 +127,7 @@
   .movie-selection-layout {
     grid-template-columns: 1fr 340px;
     height: calc(100vh - 112px);
+    height: calc(100dvh - 112px);
   }
 }
 
@@ -133,6 +135,7 @@
   .movie-selection-layout {
     grid-template-columns: 1fr 380px;
     height: calc(100vh - 112px);
+    height: calc(100dvh - 112px);
   }
 }
 
@@ -154,6 +157,7 @@
 .selected-movies-panel .window-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth inertia scrolling on iOS Safari */
   padding: 20px;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -192,6 +196,16 @@
   .selected-movies-panel {
     height: auto;
     max-height: 480px;
+  }
+}
+
+@media (max-width: 580px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .window-content {
+    padding: 12px;
   }
 }
 
