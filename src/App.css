@@ -10,6 +10,43 @@
   gap: 16px;
 }
 
+/* Lobby 2-Column Responsive Layout */
+.lobby-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.mobile-chat-toggle-wrapper {
+  display: block;
+}
+
+.lobby-chat-column {
+  display: none;
+}
+
+.lobby-chat-column.is-mobile-visible {
+  display: block;
+  margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+  .lobby-layout-grid {
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .mobile-chat-toggle-wrapper {
+    display: none;
+  }
+
+  .lobby-chat-column {
+    display: block !important;
+    margin-top: 0;
+  }
+}
+
 .button-group {
   display: flex;
   gap: 8px;
@@ -109,10 +146,41 @@
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
-/* Movie Selection 2-Column Responsive Layout */
+/* Lobby Layout Container */
+.lobby-container-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.lobby-main-box {
+  margin-bottom: 0;
+}
+
+.lobby-chat-side-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 860px) {
+  .lobby-container-layout {
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+/* Movie Selection Responsive Layout */
 .retro-container.has-movie-selection,
 .retro-container:has(.movie-selection-layout) {
   max-width: 1100px;
+}
+
+@media (min-width: 1200px) {
+  .retro-container:has(.movie-selection-layout) {
+    max-width: 1280px;
+  }
 }
 
 .movie-selection-layout {
@@ -123,20 +191,61 @@
   width: 100%;
 }
 
-@media (min-width: 900px) {
+.movie-selection-chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
   .movie-selection-layout {
     grid-template-columns: 1fr 340px;
     height: calc(100vh - 112px);
     height: calc(100dvh - 112px);
   }
+  .movie-selection-chat-panel {
+    grid-column: 1 / -1;
+    height: auto;
+  }
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1200px) {
   .movie-selection-layout {
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 1fr 320px 280px;
     height: calc(100vh - 112px);
     height: calc(100dvh - 112px);
   }
+}
+
+/* Ultra-subtle, blurry, transparent scrollbar for ChatPanel & scrollable areas */
+.chat-messages-container,
+.chat-window-panel .window-content,
+.retro-inset {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+.chat-messages-container::-webkit-scrollbar,
+.retro-inset::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track,
+.retro-inset::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb,
+.retro-inset::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease;
+}
+
+.chat-messages-container:hover::-webkit-scrollbar-thumb,
+.retro-inset:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .movie-search-panel,

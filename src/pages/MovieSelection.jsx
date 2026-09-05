@@ -6,6 +6,7 @@ import { useMoviePool } from "../hooks/useMoviePool";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Film, Search, Plus, Check, Loader, X, Play, Trash2 } from "lucide-react";
+import ChatPanel from "../components/ChatPanel";
 
 const TMDB_GENRES = {
   28: "Action",
@@ -555,6 +556,11 @@ function MovieSelection() {
             </p>
           )}
         </div>
+      </aside>
+
+      {/* Secondary Side Panel: Live Chat */}
+      <aside className="movie-selection-chat-panel">
+        <ChatPanel roomCode={roomCode} room={room} height="200px" compact />
       </aside>
     </div>
   );

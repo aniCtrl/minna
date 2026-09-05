@@ -255,7 +255,13 @@ body {
 
 @media (min-width: 900px) {
   .retro-container {
-    max-width: 720px;
+    max-width: 920px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .retro-container {
+    max-width: 1240px;
   }
 }
 
