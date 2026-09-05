@@ -1,6 +1,6 @@
 import { useRoom } from "../hooks/useRoom";
 import { useMembers } from "../hooks/useMembers";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Users, User, LogOut, ShieldAlert, X, Loader, Play, Crown, Radio, Sparkles } from "lucide-react";
 import { useChatMessages } from "../hooks/useChatMessages";
@@ -26,6 +26,13 @@ function Lobby() {
   const [processing, setProcessing] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
 
   useEffect(() => {
     if (room?.status === "closed") {
@@ -349,6 +356,7 @@ function Lobby() {
                   );
                 })
               )}
+              <div ref={messagesEndRef} />
             </div>
 
             <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
