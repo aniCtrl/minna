@@ -172,6 +172,32 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // -----------------------------------------
+    // CHAT MESSAGES
+    // -----------------------------------------
+
+    match /rooms/{roomCode}/messages/{messageId} {
+
+      // Room members can read chat messages.
+      allow read: if request.auth != null
+        && request.auth.uid in get(
+          /databases/$(database)/documents/rooms/$(roomCode)
+        ).data.members;
+
+      // Only room members can send messages,
+      // and they can only send as themselves.
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.auth.uid in get(
+          /databases/$(database)/documents/rooms/$(roomCode)
+        ).data.members
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 500;
+
+      // Messages cannot be edited or deleted for now.
+      allow update, delete: if false;
+    }
 
     // -----------------------------------------
     // DEFAULT DENY

@@ -328,4 +328,73 @@ describe("Firestore security rules", () => {
 
     await assertFails(deleteDoc(doc(db, "rooms/ABC123/movies/101")));
   });
+
+  it("allows a room member to send and read chat messages", async () => {
+    await createTestRoom();
+
+    const user2 = testEnv.authenticatedContext("user2");
+    const db = user2.firestore();
+
+    const { addDoc, collection, getDocs } = await import("firebase/firestore");
+
+    await assertSucceeds(
+      addDoc(collection(db, "rooms/ABC123/messages"), {
+        uid: "user2",
+        displayName: "User 2",
+        text: "Hello world",
+        createdAt: new Date(),
+      })
+    );
+
+    await assertSucceeds(getDocs(collection(db, "rooms/ABC123/messages")));
+  });
+
+  it("rejects a non-member trying to send chat messages", async () => {
+    await createTestRoom();
+
+    const stranger = testEnv.authenticatedContext("stranger99");
+    const db = stranger.firestore();
+
+    const { addDoc, collection, getDocs } = await import("firebase/firestore");
+
+    await assertFails(
+      addDoc(collection(db, "rooms/ABC123/messages"), {
+        uid: "stranger99",
+        displayName: "Stranger",
+        text: "Hello world",
+        createdAt: new Date(),
+      })
+    );
+
+    await assertFails(getDocs(collection(db, "rooms/ABC123/messages")));
+  });
+
+  it("rejects sending a message with empty text or spoofed uid", async () => {
+    await createTestRoom();
+
+    const user2 = testEnv.authenticatedContext("user2");
+    const db = user2.firestore();
+
+    const { addDoc, collection } = await import("firebase/firestore");
+
+    // Spoofed uid
+    await assertFails(
+      addDoc(collection(db, "rooms/ABC123/messages"), {
+        uid: "host1",
+        displayName: "User 2",
+        text: "Hello world",
+        createdAt: new Date(),
+      })
+    );
+
+    // Empty text
+    await assertFails(
+      addDoc(collection(db, "rooms/ABC123/messages"), {
+        uid: "user2",
+        displayName: "User 2",
+        text: "",
+        createdAt: new Date(),
+      })
+    );
+  });
 });

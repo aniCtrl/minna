@@ -3,10 +3,12 @@ import { useMembers } from "../hooks/useMembers";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Users, User, LogOut, ShieldAlert, X, Loader, Play, Crown, Radio, Sparkles } from "lucide-react";
+import { useChatMessages } from "../hooks/useChatMessages";
 
 import RoomCodeDisplay from "../components/RoomCodeDisplay";
 
 import { closeRoom, claimHost } from "../services/rooms";
+import { sendMessage } from "../services/chat";
 import { useAuth } from "../hooks/useAuth";
 
 function Lobby() {
@@ -16,10 +18,14 @@ function Lobby() {
   const { room, loading, error } = useRoom(roomCode);
   const members = useMembers(room);
 
+  const { messages, loading: chatLoading } = useChatMessages(roomCode);
+
   const { user } = useAuth();
 
   const [alertMessage, setAlertMessage] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   useEffect(() => {
     if (room?.status === "closed") {
@@ -68,6 +74,39 @@ function Lobby() {
       }
     } finally {
       setProcessing(false);
+    }
+  }
+
+  async function handleSendMessage() {
+    if (sendingMessage || !user) return;
+
+    const trimmedMessage = messageText.trim();
+
+    if (!trimmedMessage) return;
+
+    try {
+      setSendingMessage(true);
+
+      await sendMessage(
+        roomCode,
+        user.uid,
+        room.members?.[user.uid]?.displayName || "Anonymous",
+        trimmedMessage
+      );
+
+      setMessageText("");
+    } catch (error) {
+      console.error("Send message error:", error);
+
+      if (error.message === "EMPTY_MESSAGE") {
+        setAlertMessage("Message cannot be empty.");
+      } else if (error.message === "MESSAGE_TOO_LONG") {
+        setAlertMessage("Message is too long. Keep it under 500 characters.");
+      } else {
+        setAlertMessage("Failed to send message.");
+      }
+    } finally {
+      setSendingMessage(false);
     }
   }
 
@@ -129,7 +168,7 @@ function Lobby() {
           <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Users size={14} /> Minna.exe - Room Lobby
           </span>
-          <button 
+          <button
             onClick={() => navigate("/")}
             style={{ border: "none", background: "transparent", padding: "0 4px", display: "flex", alignItems: "center", cursor: "pointer", color: "inherit" }}
             aria-label="Exit room and back to home page"
@@ -178,7 +217,7 @@ function Lobby() {
             </span>
           </div>
 
-          <ul 
+          <ul
             aria-labelledby="active-members-heading"
             aria-live="polite"
             className="member-list-grid"
@@ -207,15 +246,149 @@ function Lobby() {
             })}
           </ul>
 
+          {/* Lobby Chat */}
+          <div style={{ marginTop: "16px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "13px",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                💬 Room Chat
+              </h3>
+
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--color-outline)",
+                }}
+              >
+                LIVE CHAT
+              </span>
+            </div>
+
+            <div
+              className="retro-inset"
+              style={{
+                height: "260px",
+                overflowY: "auto",
+                padding: "12px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+              }}
+            >
+              {chatLoading ? (
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "12px",
+                    color: "var(--color-on-surface-variant)",
+                  }}
+                >
+                  Loading chat...
+                </p>
+              ) : messages.length === 0 ? (
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "12px",
+                    color: "var(--color-on-surface-variant)",
+                    textAlign: "center",
+                    margin: "auto 0",
+                  }}
+                >
+                  No messages yet. Start the conversation.
+                </p>
+              ) : (
+                messages.map((message) => {
+                  const isSelf = message.uid === user?.uid;
+
+                  return (
+                    <div
+                      key={message.id}
+                      style={{
+                        alignSelf: isSelf ? "flex-end" : "flex-start",
+                        maxWidth: "80%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "10px",
+                          fontFamily: "var(--font-mono)",
+                          color: "var(--color-outline)",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        {isSelf ? "You" : message.displayName}
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "7px 10px",
+                          border: "1px solid var(--color-outline)",
+                          background: "var(--color-surface)",
+                          fontSize: "13px",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+              <input
+                type="text"
+                value={messageText}
+                onChange={(event) => setMessageText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleSendMessage();
+                  }
+                }}
+                placeholder="Type a message..."
+                maxLength={500}
+                disabled={sendingMessage}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              />
+
+              <button
+                className="btn-primary"
+                onClick={handleSendMessage}
+                disabled={sendingMessage || !messageText.trim()}
+              >
+                {sendingMessage ? "..." : "SEND"}
+              </button>
+            </div>
+          </div>
+
           <hr className="retro-divider" />
 
           {/* Lobby Navigation Actions */}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {room.status === "lobby" && (
-              <button 
-                className="btn-primary" 
-                onClick={() => navigate(`/movie-selection/${roomCode}`)} 
-                disabled={processing} 
+              <button
+                className="btn-primary"
+                onClick={() => navigate(`/movie-selection/${roomCode}`)}
+                disabled={processing}
                 style={{ width: "100%", padding: "12px", fontSize: "14px", display: "inline-flex", gap: "8px", alignItems: "center", justifyContent: "center" }}
               >
                 <Play size={16} /> Go to Movie Selection
@@ -223,17 +396,17 @@ function Lobby() {
             )}
 
             <div style={{ display: "flex", gap: "10px", width: "100%" }}>
-              <button 
-                onClick={handleCloseRoom} 
-                disabled={processing} 
+              <button
+                onClick={handleCloseRoom}
+                disabled={processing}
                 style={{ flex: 1, padding: "10px", display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}
               >
                 <LogOut size={13} /> Close Room
               </button>
 
-              <button 
-                onClick={handleClaimHost} 
-                disabled={processing || isCurrentUserHost} 
+              <button
+                onClick={handleClaimHost}
+                disabled={processing || isCurrentUserHost}
                 style={{ flex: 1, padding: "10px", display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "center" }}
               >
                 <ShieldAlert size={13} /> {isCurrentUserHost ? "You are Host" : "Claim Host"}
